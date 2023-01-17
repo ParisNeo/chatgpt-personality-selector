@@ -3,6 +3,10 @@ var global={
     "selected_personality":0,
     "language":0
 }
+var lang_options=[
+    "en","fr"
+];
+
 
 var textarea;
 
@@ -139,32 +143,12 @@ function build_option(option_name, select_options_list){
   return dropDown;
 }
 
-function updateUI() {
-
-    if (document.querySelector(".chatgpt-personality-selector-options")) {
-        return;
-    }
-
-    console.log("Updating UI");
-
-   
-    textarea = document.querySelector("textarea");
-    var textareaWrapper = textarea.parentNode;
-
-    var submit_personality = document.createElement("button");
-    submit_personality.innerHTML=`<svg stroke="red" fill="red" stroke-width="0" viewBox="0 0 20 20" class="h-4 w-4 rotate-90" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>`
-
-    commands = document.createElement("select");
-    commands.style.width="100%";
-    commands.style.color="black";
-    commands.style.borderRadius="10px";
-    commands.style.marginRight="20px";
-
-    // Initialize the list of commands and options
-    let commands_options_list = [{ value: "", label: "" }];
-
+function build_persons_list()
+{
     // Read the CSV file
-    let fileUrl = chrome.runtime.getURL("prompts.csv");
+    var fileUrl;
+    fileUrl = chrome.runtime.getURL(`prompts_${lang_options[global["language"]]}.csv`);
+    commands.innerHTML = '';
     // Use PapaParse to parse the CSV file
     fetch(fileUrl)
     .then((response) => response.text())
@@ -189,6 +173,49 @@ function updateUI() {
             },
         })
     });
+}
+
+function updateUI() {
+
+    if (document.querySelector(".chatgpt-personality-selector-options")) {
+        return;
+    }
+
+    console.log("Updating UI");
+
+   
+    textarea = document.querySelector("textarea");
+
+    var submit_personality = document.createElement("button");
+    submit_personality.innerHTML=`<svg stroke="red" fill="red" stroke-width="0" viewBox="0 0 20 20" class="h-4 w-4 rotate-90" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>`
+
+    language = document.createElement("select");
+    language.style.width="100%";
+    language.style.color="black";
+    language.style.borderRadius="10px";
+    language.style.marginRight="20px";
+    lang_options.forEach((row) => {
+        var optionElement = document.createElement("option");
+        optionElement.value = row;
+        optionElement.innerHTML = row;
+        optionElement.classList.add("text-white");
+        language.appendChild(optionElement);
+    });
+
+    language.addEventListener('change', (event) => {
+        global["language"] = event.target.selectedIndex
+        build_persons_list();
+        console.log(event.target.value);
+      })
+
+    commands = document.createElement("select");
+    commands.style.width="100%";
+    commands.style.color="black";
+    commands.style.borderRadius="10px";
+    commands.style.marginRight="20px";
+
+    build_persons_list();
+
 
     // textarea.addEventListener("keydown", onSubmit);
     submit_personality.addEventListener("click", onSubmit);
@@ -200,7 +227,7 @@ function updateUI() {
 
     var optionsDiv = document.createElement("div");
     optionsDiv.classList.add("chatgpt-personality-selector-options", "p-4", "space-y-2");
-    optionsDiv.style.maxHeight = "200px";
+    optionsDiv.style.maxHeight = "300px";
     optionsDiv.style.overflowY = "scroll";
   
 
@@ -229,6 +256,7 @@ function updateUI() {
 
     optionsDiv.style.width="100%";
     optionsDiv.appendChild(title);
+    optionsDiv.appendChild(language);
     optionsDiv.appendChild(commands);
     optionsDiv.appendChild(submit_personality);
     optionsDiv.appendChild(credits);
