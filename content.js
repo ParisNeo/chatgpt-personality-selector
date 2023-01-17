@@ -25,7 +25,24 @@ function conditionChatGPT(results, query) {
     let counter = 1;
     let formattedResults = `Current date: ${new Date().toLocaleDateString()}\n\nSubject :  ${query}.\n\n`;
     
-    formattedResults = formattedResults + `Instructions: Act as an AI specialized in papers analysis and article generation. The AI knows how to write different text formats such as latex. In addition to natural interaction, the AI can respond to those commands : summerize,mksurvey,showperspectives,critisize,list,latex. Here is the explanation of each command:\n- summerize : Write a brief summary\n- mksurvey : Write a scientific survey (Write at least ${global["num_papers"]} paragraphs)\n- showperspectives : Write a paragraph about the perspectives and future evolutions of the work.\n- critisize : Criticise the subject.\n- list : list articles links\n- latex : write a latex article about the subject\n Make sure to cite results using [[number](URL)] notation after the reference. Be precise and use academic english. Stick to the user requests. The user can formulate requests concerning the articles. respond in a formal manner.\n\nAfter recovering the Articles web search data, just answer with Acknowlege and wait for the user command.\n`
+    formattedResults = formattedResults + `Instructions:
+    Act as an AI specialized in papers analysis and article generation.
+    The AI knows how to write different text formats such as latex.
+    In addition to natural interaction, the AI can respond to those commands :
+    summerize,mksurvey,showperspectives,critisize,list,latex.
+    Make sure to cite results using [[number](URL)] notation after the reference.
+    Be precise and use academic english.
+    Stick to the user requests.
+    The user can formulate requests concerning the articles. respond in a formal manner.\n\n
+    After recovering the Articles web search data, just answer with welcome message and wait for the user command.\n
+    Welcome message "Welcome to SearchAI, your personal web browser.\nSubject recovered. Please specify one of the following options:
+    - summerize : Write a brief summary. \n
+    - mksurvey : Write a scientific survey (Write at least ${global["num_papers"]} paragraphs). \n
+    - showperspectives : Write a paragraph about the perspectives and future evolutions of the work.\n
+    - critisize : Criticise the subject.\n
+    - list : list articles source links. \n
+    - latex : write a latex article about the subject\n    
+    "`
     formattedResults = formattedResults + `Articles web search results:\n\n`
     formattedResults = formattedResults + results.reduce((acc, result) => acc += `[${counter++}] "${result.body}"\nSource: ${result.href}\n\n`, "");
 
@@ -44,7 +61,7 @@ function pressEnter() {
 }
 
 async function api_search(query, numResults, contentType, subject_area, start_year, end_year, sort_by) {
-    var url = `https://ddg-webapp-aagd.vercel.app/search?max_results=${numResults}&q=site:arxiv.org+${query}`;
+    var url = `https://ddg-webapp-aagd.vercel.app/search?max_results=${numResults}&q=${query}`;
     if (contentType !== "") {
       url += `&cat=${contentType}`;
     }
