@@ -1,11 +1,7 @@
 let isProcessing = false;
 var global={
-  "num_papers":10,
-  "content_type":"",
-  "subject_area":"",
-  "sort_by":"",
-  "start_year":1900,
-  "end_year":new Date().getFullYear(),
+    "selected_personality":0,
+    "language":0
 }
 
 var textarea;
@@ -77,8 +73,9 @@ function onSubmit(event) {
         console.log("shift detected");
         return;
     }
+    // Save global
     chrome.storage.sync.set({ "global": global });
-    if ((event.type === "click" || event.key === 'Enter') && !isProcessing) {
+    if (!isProcessing) {
         console.log("Processing")
         isProcessing = true;
 
@@ -86,6 +83,10 @@ function onSubmit(event) {
             if(commands.value == "")
             {
                 let query = textarea.value;
+                if(query==="")
+                {
+                    alert("To use this personality, first write the query you want to search on the internet in the query textarea then press the red button")
+                }
                 textarea.value = "";
     
                 query = query.trim();
@@ -147,15 +148,11 @@ function updateUI() {
     textarea = document.querySelector("textarea");
     var textareaWrapper = textarea.parentNode;
 
-    var submit_divs = document.createElement("div");
-    var buttons = textareaWrapper.querySelectorAll("button");
-    console.log(`Found ${buttons.length} buttons`)
-    var btnSubmit = buttons[buttons.length-1];
-    var survey_submit = document.createElement("button");
-    survey_submit.innerHTML=`<svg stroke="red" fill="red" stroke-width="0" viewBox="0 0 20 20" class="h-4 w-4 rotate-90" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>`
+    var submit_personality = document.createElement("button");
+    submit_personality.innerHTML=`<svg stroke="red" fill="red" stroke-width="0" viewBox="0 0 20 20" class="h-4 w-4 rotate-90" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>`
 
-    textareaWrapper.insertBefore(submit_divs, btnSubmit)
     commands = document.createElement("select");
+    commands.style.width="100%";
     commands.style.color="black";
     commands.style.borderRadius="10px";
     commands.style.marginRight="20px";
@@ -190,11 +187,8 @@ function updateUI() {
         })
     });
 
-    submit_divs.appendChild(commands);
-    submit_divs.appendChild(survey_submit)
-    submit_divs.appendChild(btnSubmit)
     // textarea.addEventListener("keydown", onSubmit);
-    survey_submit.addEventListener("click", onSubmit);
+    submit_personality.addEventListener("click", onSubmit);
 
 
 
@@ -230,7 +224,10 @@ function updateUI() {
     credits.classList.add("text-sm", "text-gray-500");
 
 
+    optionsDiv.style.width="100%";
     optionsDiv.appendChild(title);
+    optionsDiv.appendChild(commands);
+    optionsDiv.appendChild(submit_personality);
     optionsDiv.appendChild(credits);
 
 
