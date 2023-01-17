@@ -201,6 +201,7 @@ function updateUI() {
         optionElement.classList.add("text-white");
         language.appendChild(optionElement);
     });
+    language.selectedIndex = global["language"]
 
     language.addEventListener('change', (event) => {
         global["language"] = event.target.selectedIndex
