@@ -60,23 +60,9 @@ function pressEnter() {
     textarea.dispatchEvent(enterEvent);
 }
 
-async function api_search(query, numResults, contentType, subject_area, start_year, end_year, sort_by) {
-    var url = `https://ddg-webapp-aagd.vercel.app/search?max_results=${numResults}&q=${query}`;
-    if (contentType !== "") {
-      url += `&cat=${contentType}`;
-    }
-    if (subject_area !== "") {
-      url += `&sub=${subject_area}`;
-    }
-    if (start_year !== "") {
-      url += `&from_date=${start_year}`;
-    }
-    if (end_year !== "") {
-        url += `&to_date=${end_year}`;
-      }
-      if (sort_by !== "") {
-      url += `&sort_by=${sort_by}`;
-    }
+// use max_results= to set the maximum number of results expoected
+async function api_search(query) {
+    var url = `https://ddg-webapp-aagd.vercel.app/search?&q=${query}`;
     console.log(url);
     const response = await fetch(url);
     return await response.json();
@@ -102,7 +88,7 @@ function onSubmit(event) {
                 let query = textarea.value;
                 if(query==="")
                 {
-                    alert("To use this personality, first write the query you want to search on the internet in the query textarea then press the red button")
+                    alert("To use this personality, first write the query you want to search on the internet in the query textarea then press the red button.\nuse max_results=5 to set the maximum number of results expoected to 5 or any other value")
                 }
                 textarea.value = "";
     
