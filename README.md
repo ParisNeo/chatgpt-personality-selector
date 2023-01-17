@@ -33,4 +33,4 @@ Please note that since this extension is not available on the Google Chrome mark
 
 
 # Disclamer
-Chatgpt is a language model trained with a large set of data, but nontheless, it is not really a person and may give wrong and missleading outputs. Use it at your own risk. Do not use its advises to make financial or medical decisions as it may be wrong even if it sounds real. This is intended to help and not to replace humans and real professionals.
+ChatGPT is a highly advanced language model that has been trained with a vast amount of data, however, it is important to note that it is not a human being and may provide incorrect or misleading outputs. It should be used with caution and not for making critical decisions such as financial or medical choices, as it may not always be reliable despite its sophisticated capabilities. The purpose of this tool is to assist and augment human capabilities, rather than replace them. It is recommended to always consult with a qualified professional before making any important decisions.
