@@ -5,7 +5,7 @@
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/fhbjgbiflinjbdggehcddcbncdddomop.svg)](https://chrome.google.com/webstore/detail/chatgpt-audio-extension/fhbjgbiflinjbdggehcddcbncdddomop)
 
 
-# ChatGpt written add to this extention
+# ChatGpt written ad to this extention
 Are you tired of using a generic chatbot that can't seem to understand your specific needs? Look no further than ChatGPT Personality Selector - the ultimate Google Chrome extension for customizing your chatbot experience.
 
 With ChatGPT Personality Selector, you can easily condition your chatbot to become a specific person or tool that is specialized in a very specific area. Whether you need a doctor, a stand-up comedian, a Linux terminal, or a coder, this extension has you covered.

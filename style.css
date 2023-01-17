@@ -1,4 +1,4 @@
-.chatgpt-paper-survey-toolbar {
+.chatgpt-personality-selector-toolbar {
     margin: 0.5em 0em;
     display: flex;
     align-items: end;
@@ -9,13 +9,13 @@
     box-sizing: border-box;
 }
 
-.chatgpt-paper-survey-toggle {
+.chatgpt-personality-selector-toggle {
     cursor: pointer;
     display: inline-block;
     padding: 0.5em 0;
 }
 
-.chatgpt-paper-survey-toggle-switch {
+.chatgpt-personality-selector-toggle-switch {
     display: inline-block;
     background: #ccc;
     border-radius: 8px;
@@ -26,12 +26,12 @@
     transition: background 0.25s;
 }
 
-.chatgpt-paper-survey-toggle-switch:before,
-.chatgpt-paper-survey-toggle-switch:after {
+.chatgpt-personality-selector-toggle-switch:before,
+.chatgpt-personality-selector-toggle-switch:after {
     content: "";
 }
 
-.chatgpt-paper-survey-toggle-switch:before {
+.chatgpt-personality-selector-toggle-switch:before {
     display: block;
     background: linear-gradient(to bottom, #fff 0%, #eee 100%);
     border-radius: 50%;
@@ -44,25 +44,16 @@
     transition: left 0.25s;
 }
 
-.chatgpt-paper-survey-toggle:hover .chatgpt-paper-survey-toggle-switch:before {
+.chatgpt-personality-selector-toggle:hover .chatgpt-personality-selector-toggle-switch:before {
     background: linear-gradient(to bottom, #fff 0%, #fff 100%);
     box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.5);
 }
 
-.chatgpt-paper-survey-toggle-checkbox:checked+.chatgpt-paper-survey-toggle-switch {
-    background: #10A37F;
+select{
+    border-radius: 10px;
+    margin: 10px;
 }
-
-.chatgpt-paper-survey-toggle-checkbox:checked+.chatgpt-paper-survey-toggle-switch:before {
-    left: 15px;
-}
-
-.chatgpt-paper-survey-toggle-checkbox {
-    position: absolute;
-    visibility: hidden;
-}
-
-.chatgpt-paper-survey-toggle-label {
+.chatgpt-personality-selector-toggle-label {
     color:white;
     margin-left: 5px;
     position: relative;
