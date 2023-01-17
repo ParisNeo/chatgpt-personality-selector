@@ -1,0 +1,74 @@
+.chatgpt-paper-survey-toolbar {
+    margin: 0.5em 0em;
+    display: flex;
+    align-items: end;
+}
+
+*:before, 
+*:after {
+    box-sizing: border-box;
+}
+
+.chatgpt-paper-survey-toggle {
+    cursor: pointer;
+    display: inline-block;
+    padding: 0.5em 0;
+}
+
+.chatgpt-paper-survey-toggle-switch {
+    display: inline-block;
+    background: #ccc;
+    border-radius: 8px;
+    width: 29px;
+    height: 16px;
+    position: relative;
+    vertical-align: middle;
+    transition: background 0.25s;
+}
+
+.chatgpt-paper-survey-toggle-switch:before,
+.chatgpt-paper-survey-toggle-switch:after {
+    content: "";
+}
+
+.chatgpt-paper-survey-toggle-switch:before {
+    display: block;
+    background: linear-gradient(to bottom, #fff 0%, #eee 100%);
+    border-radius: 50%;
+    box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.25);
+    width: 12px;
+    height: 12px;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: left 0.25s;
+}
+
+.chatgpt-paper-survey-toggle:hover .chatgpt-paper-survey-toggle-switch:before {
+    background: linear-gradient(to bottom, #fff 0%, #fff 100%);
+    box-shadow: 0 0 0 0.5px rgba(0, 0, 0, 0.5);
+}
+
+.chatgpt-paper-survey-toggle-checkbox:checked+.chatgpt-paper-survey-toggle-switch {
+    background: #10A37F;
+}
+
+.chatgpt-paper-survey-toggle-checkbox:checked+.chatgpt-paper-survey-toggle-switch:before {
+    left: 15px;
+}
+
+.chatgpt-paper-survey-toggle-checkbox {
+    position: absolute;
+    visibility: hidden;
+}
+
+.chatgpt-paper-survey-toggle-label {
+    color:white;
+    margin-left: 5px;
+    position: relative;
+    top: 2px;
+}
+
+span{
+    color:white;
+}
