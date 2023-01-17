@@ -18,11 +18,14 @@ Say goodbye to generic chatbots and hello to a personalized experience with Chat
 
 Installing ChatGPT Personality Selector on your machine is easy. Follow these simple steps:
 
-Go to https://github.com/ParisNeo/chatgpt-personality-selector
-Click on the "Clone or download" button and select "Download ZIP"
-Extract the files from the downloaded ZIP folder
-Open Google Chrome and go to chrome://extensions/
-Turn on the "Developer mode" switch in the top right corner of the page
-Click on the "Load unpacked" button and select the extracted folder
+- Go to https://github.com/ParisNeo/chatgpt-personality-selector
+- Click on the "Clone or download" button and select "Download ZIP"
+- Extract the files from the downloaded ZIP folder
+- Open Google Chrome and go to chrome://extensions/
+- Turn on the "Developer mode" switch in the top right corner of the page
+- Click on the "Load unpacked" button and select the extracted folder
+
 The ChatGPT Personality Selector extension should now be installed and ready to use on your Google Chrome browser.
+
+## Note
 Please note that since this extension is not available on the Google Chrome market, it may not receive automatic updates. To ensure you are using the latest version, check for updates on the GitHub page periodically.
