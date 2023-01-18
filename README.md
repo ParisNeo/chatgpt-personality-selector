@@ -4,6 +4,10 @@
 [![GitHub license](https://badgen.net/github/license/ParisNeo/chatgpt-personality-selector)](https://github.com/ParisNeo/chatgpt-personality-selector/blob/master/LICENSE)
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/fhbjgbiflinjbdggehcddcbncdddomop.svg)](https://chrome.google.com/webstore/detail/chatgpt-audio-extension/fhbjgbiflinjbdggehcddcbncdddomop)
 
+ChatGPT Personality Selector is a Google Chrome extension that allows users to customize their chatbot experience. With this extension, users can easily condition their chatbot to become a person or tool specialized in a specific area such as an educator, doctor, translator, password generator, stand-up comedian, psychic, expert in startup creation, developer, or even a Linux, python or other terminal.
+
+To use the extension, users simply select the desired personality from the large set of options and press the validation button. The chatbot will then be instantly transformed and ready to perform the specific task with ease.
+
 
 # ChatGpt written ad to this extention
 Are you tired of using a generic chatbot that doesn't seem to understand your specific needs? Look no further, ChatGPT Personality Selector is the ultimate extension for customizing your chatbot experience on Google Chrome.
