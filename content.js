@@ -64,7 +64,7 @@ function pressEnter() {
     textarea.dispatchEvent(enterEvent);
 }
 
-// use max_results= to set the maximum number of results expoected
+// use &max_results= to set the maximum number of results expoected
 async function api_search(query) {
     var url = `https://ddg-webapp-aagd.vercel.app/search?&q=${query}`;
     console.log(url);
@@ -92,7 +92,7 @@ function onSubmit(event) {
                 let query = textarea.value;
                 if(query==="")
                 {
-                    alert("To use this personality, first write the query you want to search on the internet in the query textarea then press the red button.\nuse max_results=5 to set the maximum number of results expoected to 5 or any other value")
+                    alert("To use this personality, first write the query you want to search on the internet in the query textarea then press the red button.\nAdd &max_results=<the number of results you seek> to set the maximum number of results expoected.\nExample: &max_results=10 to set it to 10")
                 }
                 textarea.value = "";
     
