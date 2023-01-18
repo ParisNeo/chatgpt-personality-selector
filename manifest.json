@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "ChatGPT-Personality-Selector",
-    "description": "This extention contains a precrafted chat gpt profiles that you can load to boost your chatgpt experience enhanced with the experience of multiple prompt engeneering tricks.",
+    "description": "This extention allows the user to condition chatgpt for specific applications rsulting in a more optimized use of the tool.",
     "version": "1.0",
     "icons": {
         "16": "icon.png",
