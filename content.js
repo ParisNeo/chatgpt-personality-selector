@@ -1,5 +1,6 @@
 let isProcessing = false;
 var global={
+    "show_help_at_startup":true,
     "selected_personality":0,
     "language":0
 }
@@ -9,11 +10,58 @@ var lang_options=[
 
 
 var textarea;
-
+var observer;
+var body;
+var navMenu;
+isSpeaking= false;
 
 chrome.storage.sync.get(["global"], (data) => {
     global =  data.global ;
 });
+
+function createWelcomeDialog() {
+
+    // Check if the user has chosen not to show the dialog again
+    if (global["show_help_at_startup"]) {
+        console.log("Adding dialog");
+        // Create the dialog
+        var dialog = document.createElement("div");
+        dialog.id = "my-dialog";
+        dialog.style.display = "block";
+
+        // Create the checkbox
+        var checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.id = "dont-show-again";
+
+        // Create the label
+        var label = document.createElement("label");
+        label.htmlFor = "dont-show-again";
+        label.innerText = "Don't show this again";
+
+        // Add the checkbox and label to the dialog
+        dialog.appendChild(checkbox);
+        dialog.appendChild(label);
+
+        // Add the dialog to the page
+        document.body.appendChild(dialog);
+
+        // Add an event listener to the checkbox to update the user's preference
+        checkbox.addEventListener("change", function() {
+            global["show_help_at_startup"] = !this.checked;
+            chrome.storage.sync.set({"global": global});
+        });
+
+        var closeBtn = document.createElement("button");
+        closeBtn.innerText = "Close";
+        dialog.appendChild(closeBtn);
+
+        closeBtn.addEventListener("click", function() {
+            dialog.style.display = "none";
+        });
+
+    }
+}
 
 
 function showErrorMessage(e) {
@@ -83,7 +131,7 @@ function onSubmit(event) {
     // Save global
     chrome.storage.sync.set({ "global": global });
     if (!isProcessing) {
-        console.log("Processing")
+        console.log("Starting")
         isProcessing = true;
 
         try {
@@ -158,42 +206,57 @@ function build_persons_list()
             header: true,
             complete: function(results) {
                 // Iterate through the rows of the CSV file
-            console.log(`csv file received : ${results.data}`);
-            results.data.forEach((row) => {
-                console.log(`adding : ${row.act}`);
-
-                // Add the act and prompt columns to the list of commands and options
-                var optionElement = document.createElement("option");
-                optionElement.value = row.prompt;
-                optionElement.innerHTML = row.act;
-                optionElement.classList.add("text-white");
-                commands.appendChild(optionElement);
-                optionElement.style.color="black";
-            });
+                results.data.forEach((row) => {
+                    // Add the act and prompt columns to the list of commands and options
+                    var optionElement = document.createElement("option");
+                    optionElement.value = row.prompt;
+                    optionElement.innerHTML = row.act;
+                    optionElement.classList.add("text-white");
+                    commands.appendChild(optionElement);
+                    optionElement.style.color="black";
+                });
             },
         })
     });
 }
 
 function updateUI() {
+    navMenu = document.querySelector('nav');
 
-    if (document.querySelector(".chatgpt-personality-selector-options")) {
-        return;
+
+    var optionsDiv = document.getElementById("chatgpt-personality-selector-options");
+    if (optionsDiv) {
+        optionsDiv.innerHTML="";
     }
+    else{
+        var optionsDiv = document.createElement("div");
+        optionsDiv.id = "chatgpt-personality-selector-options";
+        optionsDiv.style.maxHeight = "300px";
+        optionsDiv.style.overflowY = "scroll";
 
+        var divider = document.createElement("hr");
+        navMenu.appendChild(divider);
+        navMenu.appendChild(optionsDiv);
+
+    }
     console.log("Updating UI");
 
    
     textarea = document.querySelector("textarea");
 
     var submit_personality = document.createElement("button");
+    submit_personality.id = "submit-personality"
     submit_personality.innerHTML=`<svg stroke="red" fill="red" stroke-width="0" viewBox="0 0 20 20" class="h-4 w-4 rotate-90" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>`
+    submit_personality.addEventListener("click", onSubmit);
+
 
     language = document.createElement("select");
     language.style.width="100%";
     language.style.color="black";
     language.style.borderRadius="10px";
     language.style.marginRight="20px";
+
+
     lang_options.forEach((row) => {
         var optionElement = document.createElement("option");
         optionElement.value = row;
@@ -219,18 +282,7 @@ function updateUI() {
 
 
     // textarea.addEventListener("keydown", onSubmit);
-    submit_personality.addEventListener("click", onSubmit);
 
-
-
-
-    var divider = document.createElement("hr");
-
-    var optionsDiv = document.createElement("div");
-    optionsDiv.classList.add("chatgpt-personality-selector-options", "p-4", "space-y-2");
-    optionsDiv.style.maxHeight = "300px";
-    optionsDiv.style.overflowY = "scroll";
-  
 
     var title = document.createElement("h4");
     title.innerHTML = "ChatGPT Personality selector";
@@ -267,22 +319,203 @@ function updateUI() {
 
 
 
-    var navMenu = document.querySelector('nav');
-    navMenu.appendChild(divider);
-    navMenu.appendChild(optionsDiv);
+
+    setTimeout(()=>{
+        observer.observe(body, {
+            childList: true, characterData: true, subtree: true 
+        });
+    }, 2000);
+
+    console.log("Done updating ui")
+}
+
+// Audio code
+function splitString(string, maxLength) {
+    const sentences = string.match(/[^.!?]+[.!?]/g);
+    const strings = [];
+    let currentString = '';
+  
+    if (sentences) {
+      for (const sentence of sentences) {
+        if (currentString.length + sentence.length > maxLength) {
+          strings.push(currentString);
+          currentString = '';
+        }
+  
+        currentString += `${sentence} `;
+      }
+    } else {
+      strings.push(string);
+    }
+  
+    if (currentString) {
+      strings.push(currentString);
+    }
+  
+    return strings;
+  }
+  function addListeners(button, utterThis){
+    console.log("Adding listeners")
+    utterThis.onstart = (event) => {
+      button.style.backgroundColor = "red";
+      button.style.boxShadow = "2px 2px 0.5px #808080";
+    };
+    
+    utterThis.onend = (event) => {
+      button.style.backgroundColor = "";
+      button.style.boxShadow = "";
+    };
+  }
+  
+  
+  const synth = window.speechSynthesis || webkitspeechSynthesis;
+  voices = synth.getVoices();
+
+function attachAudio_modules(div)
+{
+    let selects = [];
+    console.log(div);
+    if (div.parentNode.getElementsByClassName("audio_block").length>0){
+      return;
+    }
+    const button = document.createElement("button");
+    button.innerHTML = "🕪";
+    const select = document.createElement("select");
+    //div.parentNode.insertBefore(button, div.nextSibling);
+    //button.parentNode.insertBefore(select, button.nextSibling);  
+    const wrapper = document.createElement("div");
+    wrapper.classList.add("audio_block");
+    div.classList.add("flex-1");
+    button.classList.add("ml-2");
+    select.style.width="50%";
+    select.style.color="black";
+    select.style.borderRadius="10px";
+    select.style.marginRight="20px";
+    wrapper.appendChild(button);
+    wrapper.appendChild(select);
+    div.parentNode.appendChild(wrapper);
+    selects.push(select);
+
+
+    voices = []
+    function populateVoicesList() {
+      console.log("Populating the list of voices")
+      voices = synth.getVoices();
+      selects.forEach((select)=>{
+        for (let i = 0; i < voices.length ; i++) {
+          const option = document.createElement('option');
+          option.textContent = `${voices[i].name} (${voices[i].lang})`;
+      
+          if (voices[i].default) {
+            option.textContent += ' — DEFAULT';
+          }
+      
+          option.setAttribute('data-lang', voices[i].lang);
+          option.setAttribute('data-name', voices[i].name);
+          select.appendChild(option);
+        }  
+      });
+    }
+
+    if (synth.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = populateVoicesList;
+    }
+    
+    
+    button.addEventListener("click", () => {
+      if(isSpeaking)
+      {
+        synth.cancel()
+        isSpeaking= false;
+      }
+      else{
+        isSpeaking=true;
+        text=wrapper.previousSibling.textContent;
+        console.log(text)
+
+
+        const selectedOption = select.selectedOptions[0].getAttribute('data-name');
+        var selectedVoice = null;
+        console.log(`Found selected voice : ${selectedOption}`);
+        for (let i = 0; i < voices.length ; i++) {
+          if (voices[i].name === selectedOption) {
+            selectedVoice = voices[i];
+            console.log("Found selected voice");
+          }
+        }
+        console.log(selectedVoice.voiceURI)
+        if (selectedVoice && selectedVoice.voiceURI === 'native'){
+          console.log("native");
+          const utterThis = new SpeechSynthesisUtterance(text);
+          utterThis.voice = selectedVoice
+          addListeners(button, utterThis)
+          synth.speak(utterThis); 
+        }
+        else{
+          console.log("Not native");
+          texts = splitString(text, 200);
+          texts.forEach((text)=>{
+            const utterThis = new SpeechSynthesisUtterance(text);
+            utterThis.voice = selectedVoice
+            addListeners(button, utterThis)
+            synth.speak(utterThis);   
+          })
+        }
+      }
+
+    });
 }
 
 
 console.log("Running Chat GPT personality selector code");
+var callback = function(mutationsList, observer) {    
+    observer.disconnect();
+    setTimeout(updateUI, 1000); //updateUI();
+
+    for(var mutation of mutationsList) {
+        if (mutation.type === 'childList') {
+            var newNodes = mutation.addedNodes;
+            for(var i = 0; i < newNodes.length; i++) {
+                if(newNodes[i].nodeType === Node.ELEMENT_NODE && newNodes[i].innerText && newNodes[i].innerText.indexOf("Regenerate response") !== -1) {
+                        // Do something when text is detected
+                        console.log("Ready");
+                        isProcessing = false;
+              }
+            }
+        }
+    }
+    if(!isProcessing){
+      var main = document.querySelector("main");
+      var divs = main.querySelectorAll("div");
+      var lastDivWithText;
+  
+      for (let i = 0; i < divs.length; i++) {
+          if (divs[i].childNodes.length === 1 && divs[i].childNodes[0].nodeType === 3) {
+            lastDivWithText = divs[i];
+          }
+          else if (divs[i].getElementsByTagName("p").length > 0) {
+            lastDivWithText = divs[i];
+          }
+      }
+      
+      if(lastDivWithText)
+      {
+        setTimeout(attachAudio_modules(lastDivWithText),500);
+      }
+    }
 
 
-window.onload = function() {
-    const titleEl = document.querySelector('title');
-    const observer = new MutationObserver(() => {
-        setTimeout(updateUI, 2000); //updateUI();
-    });
-
-    observer.observe(titleEl, {
-        childList: true
-    });
 };
+
+var navMenu = document.querySelector('nav');
+window.addEventListener('load', (event) => {
+    createWelcomeDialog();
+    console.log("Chatgpt Personality selector module");
+    body = document.body;
+    
+    observer = new MutationObserver(callback);
+    observer.observe(body, {
+        childList: true, characterData: true, subtree: true 
+    });    
+});
+
