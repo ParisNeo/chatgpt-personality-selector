@@ -501,6 +501,10 @@ var callback = function(mutationsList, observer) {
       {
         setTimeout(()=>{attachAudio_modules(lastDivWithText)},2000);
       }
+      console.log("Done");
+    }
+    else{
+      console.log("Still processing");
     }
 
 
