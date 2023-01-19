@@ -2,8 +2,10 @@ let isProcessing = false;
 var global={
     "show_help_at_startup":true,
     "selected_personality":0,
-    "language":0
-}
+    "language":0,
+    "voice":0,
+    "auto_audio":false
+  }
 var lang_options=[
     "en","fr"
 ];
@@ -13,6 +15,7 @@ var textarea;
 var observer;
 var body;
 var navMenu;
+var audio_wrapper;
 isSpeaking= false;
 
 chrome.storage.sync.get(["global"], (data) => {
@@ -247,14 +250,28 @@ function updateUI() {
     var submit_personality = document.createElement("button");
     submit_personality.id = "submit-personality"
     submit_personality.innerHTML=`<svg stroke="red" fill="red" stroke-width="0" viewBox="0 0 20 20" class="h-4 w-4 rotate-90" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>`
+    submit_personality.style.
     submit_personality.addEventListener("click", onSubmit);
 
+    language_div =  document.createElement("div");
+    language_div.style.width="100%";
+    language_div.style.display="flex";
+
+    language_label = document.createElement("label");
+    language_label.textContent="language";
+    language_label.style.flex = "1";
 
     language = document.createElement("select");
-    language.style.width="100%";
+    language.style.marginLeft="5px";
+    language.style.width="30%";
     language.style.color="black";
     language.style.borderRadius="10px";
     language.style.marginRight="20px";
+    language.style.flex = "1";
+
+
+    language_div.appendChild(language_label)
+    language_div.appendChild(language)
 
 
     lang_options.forEach((row) => {
@@ -272,7 +289,19 @@ function updateUI() {
         console.log(event.target.value);
       })
 
+
+    commands_div =  document.createElement("div");
+    commands_div.style.width="100%";
+    commands_div.style.display="flex";
+
+    commands_label = document.createElement("label");
+    commands_label.textContent="Personality";
+    commands_label.style.flex = "1";
+
+
+
     commands = document.createElement("select");
+    commands.style.marginLeft="5px";
     commands.style.width="100%";
     commands.style.color="black";
     commands.style.borderRadius="10px";
@@ -280,8 +309,36 @@ function updateUI() {
 
     build_persons_list();
 
+    commands_div.appendChild(commands_label)
+    commands_div.appendChild(commands)
 
-    // textarea.addEventListener("keydown", onSubmit);
+    // textarea.addEventListener("keydown", onSautoread
+
+    autoread_div =  document.createElement("div");
+    autoread_div.style.width="100%";
+    autoread_div.style.display="flex";
+    
+    autoread_label = document.createElement("label");
+    autoread_label.textContent="Autoread";
+    
+    autoread = document.createElement("input");
+    autoread.type="checkbox"
+    autoread.style.marginLeft="20px";
+    autoread.style.color="black";
+    autoread.style.borderRadius="10px";
+    autoread.style.marginRight="20px";
+    autoread.style.width="20px";
+    autoread.style.height="20px";
+    
+    autoread.addEventListener("click", function() {
+        console.log(this.checked);
+        global["auto_audio"]=this.checked;
+        chrome.storage.sync.set({"global": global});
+    });
+    autoread.checked = global["auto_audio"]
+    autoread_div.appendChild(autoread_label)
+    autoread_div.appendChild(autoread)
+
 
 
     var title = document.createElement("h4");
@@ -309,11 +366,13 @@ function updateUI() {
 </footer>`;
     credits.classList.add("text-sm", "text-gray-500");
 
+    
 
     optionsDiv.style.width="100%";
     optionsDiv.appendChild(title);
-    optionsDiv.appendChild(language);
-    optionsDiv.appendChild(commands);
+    optionsDiv.appendChild(language_div);
+    optionsDiv.appendChild(commands_div);
+    optionsDiv.appendChild(autoread_div);
     optionsDiv.appendChild(submit_personality);
     optionsDiv.appendChild(credits);
 
@@ -381,19 +440,18 @@ function attachAudio_modules(div)
     const button = document.createElement("button");
     button.innerHTML = "🕪";
     const select = document.createElement("select");
-    //div.parentNode.insertBefore(button, div.nextSibling);
-    //button.parentNode.insertBefore(select, button.nextSibling);  
-    const wrapper = document.createElement("div");
-    wrapper.classList.add("audio_block");
+
+    audio_wrapper = document.createElement("div");
+    audio_wrapper.classList.add("audio_block");
     div.classList.add("flex-1");
     button.classList.add("ml-2");
     select.style.width="50%";
     select.style.color="black";
     select.style.borderRadius="10px";
     select.style.marginRight="20px";
-    wrapper.appendChild(button);
-    wrapper.appendChild(select);
-    div.parentNode.appendChild(wrapper);
+    audio_wrapper.appendChild(button);
+    audio_wrapper.appendChild(select);
+    div.parentNode.appendChild(audio_wrapper);
     selects.push(select);
 
 
@@ -413,26 +471,43 @@ function attachAudio_modules(div)
           option.setAttribute('data-lang', voices[i].lang);
           option.setAttribute('data-name', voices[i].name);
           select.appendChild(option);
-        }  
+        } 
+        select.addEventListener("change", function() {
+          // Code to execute when the selected option changes
+          console.log(this.value);
+          global["voice"]=this.value;
+          chrome.storage.sync.set({"global": global});
+        });
+        if(global["voice"]!="")
+        {
+          select.value = global["voice"];
+        }
       });
+
+      if(global["auto_audio"]){
+        play_audio();
+      }
+  
     }
     setTimeout(populateVoicesList, 1000);
     
-    
-    button.addEventListener("click", () => {
+    function play_audio(){
       if(isSpeaking)
       {
+        console.log("stopping audio");
+
         button.style.backgroundColor = "";
         button.style.boxShadow = "";
         synth.cancel()
         isSpeaking= false;
       }
       else{
+        console.log("starting audio");
         isSpeaking=true;
-        text=wrapper.previousSibling.textContent;
+        text=audio_wrapper.previousSibling.textContent;
         console.log(text)
-
-
+    
+    
         const selectedOption = select.selectedOptions[0].getAttribute('data-name');
         var selectedVoice = null;
         console.log(`Found selected voice : ${selectedOption}`);
@@ -461,7 +536,9 @@ function attachAudio_modules(div)
           })
         }
       }
-
+    }
+    button.addEventListener("click", () => {
+      play_audio();
     });
 }
 
@@ -499,7 +576,14 @@ var callback = function(mutationsList, observer) {
       
       if(lastDivWithText)
       {
-        setTimeout(()=>{attachAudio_modules(lastDivWithText)},2000);
+        var html = document.documentElement.outerHTML;
+        if(html.search("::after")!=-1){
+          console.log("::after is present in the page");
+        }else{
+          console.log("::after is not present in the page");
+          setTimeout(()=>{attachAudio_modules(lastDivWithText)},2000);
+        }
+
       }
       console.log("Done");
     }
