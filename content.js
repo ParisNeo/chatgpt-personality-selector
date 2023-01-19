@@ -373,8 +373,8 @@ function splitString(string, maxLength) {
 
 function attachAudio_modules(div)
 {
+    console.log("Adding audio tag")
     let selects = [];
-    console.log(div);
     if (div.parentNode.getElementsByClassName("audio_block").length>0){
       return;
     }
@@ -416,15 +416,14 @@ function attachAudio_modules(div)
         }  
       });
     }
-
-    if (synth.onvoiceschanged !== undefined) {
-      speechSynthesis.onvoiceschanged = populateVoicesList;
-    }
+    setTimeout(populateVoicesList, 1000);
     
     
     button.addEventListener("click", () => {
       if(isSpeaking)
       {
+        button.style.backgroundColor = "";
+        button.style.boxShadow = "";
         synth.cancel()
         isSpeaking= false;
       }
@@ -500,7 +499,7 @@ var callback = function(mutationsList, observer) {
       
       if(lastDivWithText)
       {
-        setTimeout(attachAudio_modules(lastDivWithText),500);
+        setTimeout(()=>{attachAudio_modules(lastDivWithText)},2000);
       }
     }
 
