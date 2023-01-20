@@ -79,7 +79,7 @@ button{
 
 .flex {
     display: flex;
-  }
+}
   
 .items-center {
     align-items: center;
@@ -91,6 +91,12 @@ button{
 
 .ml-2 {
     margin-left: 0.5rem;
+
+}
+
+.ml-2:hover {
+    margin-left: 0.5rem;
+    background-color: beige;
 }
 
 .color {

@@ -4,7 +4,9 @@ chrome.runtime.onInstalled.addListener(() => {
         global:{
             "show_help_at_startup":true,
             "selected_personality":0,
-            "language":0
-          }
+            "language":0,
+            "voice":0,
+            "auto_audio":false
+        }
     });
 });
