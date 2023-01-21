@@ -134,6 +134,9 @@ form{
     order: 2;
 }
 
+.settings-btn{
+    width: 25px;
+}
 
 
 .flex {
@@ -161,10 +164,14 @@ form{
 .color {
     color: red;
 }
-
-select{
-    width:100%,
-    color:black,
-    borderRadius:10px,
-    marginRight:20px
+.audio-out-button{
+    width:25px;
 }
+.settings-btn{
+    width:25px;
+}
+select {
+    width: 200px !important; /* set the width of the select */
+    color: black !important; /* set the text color */
+    background-color: lightgray !important; /* set the background color */
+  }

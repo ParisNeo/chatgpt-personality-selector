@@ -1,9 +1,9 @@
 let isProcessing = false;
 var global={
     "show_help_at_startup":true,
-    "selected_personality":0,
-    "language":0,
-    "voice":0,
+    "selected_personality":"",
+    "language":"",
+    "voice":"",
     "auto_audio":false
   }
 var lang_options=[
@@ -12,11 +12,13 @@ var lang_options=[
   { value: "es-ES", label: "Español" },
 ];
 
+var floatingDiv;
 
 var textarea;
 var observer;
 var body;
 var audio_wrapper;
+var voice_select;
 
 const synth = window.speechSynthesis || webkitspeechSynthesis;
 var voices = synth.getVoices();
@@ -319,7 +321,7 @@ function build_persons_list()
 function build_ui(){
   console.log("building ui");
   // Create the main div
-  var floatingDiv = document.createElement("div");
+  floatingDiv = document.createElement("div");
   floatingDiv.classList.add("floating-div");
   document.body.appendChild(floatingDiv);
   // Create the title bar div
@@ -339,7 +341,7 @@ function build_ui(){
 
   // Add a click event listener to the close button
   closeButton.addEventListener("click", function() {
-    floatingDiv.remove();
+    floatingDiv.style.display="none";
   });
 
   // Append the close button to the main div
@@ -367,20 +369,17 @@ function build_ui(){
 
   language_div =  document.createElement("div");
   language_div.style.width="100%";
-  language_div.style.display="flex";
 
   language_label = document.createElement("label");
   language_label.textContent="Language";
-  language_label.style.flex = "1";
   language_label.style.width = "100px";
 
   language_select = document.createElement("select");
   language_select.style.marginLeft="5px";
-  language_select.style.width="100px";
+  language_select.style.width="300px";
   language_select.style.color="black";
   language_select.style.borderRadius="10px";
   language_select.style.marginRight="20px";
-  language_select.style.flex = "1";
 
 
   language_div.appendChild(language_label)
@@ -398,6 +397,7 @@ function build_ui(){
 
   language_select.addEventListener('change', (event) => {
       global["language"] = event.target.selectedIndex
+      chrome.storage.sync.set({"global": global});
       build_persons_list();
       console.log(event.target.value);
     })
@@ -405,33 +405,40 @@ function build_ui(){
 
   commands_div =  document.createElement("div");
   commands_div.style.width="100%";
-  commands_div.style.display="flex";
 
   commands_label = document.createElement("label");
   commands_label.textContent="Personality";
-  commands_label.style.flex = "1";
   commands_label.style.width = "100px";
 
 
 
   commands = document.createElement("select");
   commands.style.marginLeft="5px";
-  commands.style.width="100px";
+  commands.style.width="300px";
   commands.style.color="black";
   commands.style.borderRadius="10px";
   commands.style.marginRight="20px";
+  commands.addEventListener("change",()=>{
+    global["selected_personality"]=this.selectedIndex;
+    chrome.storage.sync.set({"global": global});
+  });
+  commands.selectedIndex = global["selected_personality"]
+
+
 
   build_persons_list();
 
   commands_div.appendChild(commands_label)
   commands_div.appendChild(commands)
+  commands_div.appendChild(submit_personality)
+  
 
 
   voice_select_label = document.createElement("label");
   voice_select_label.textContent="Voice";
   voice_select_label.style.width="100px";
 
-  const voice_select = document.createElement("select");
+  voice_select = document.createElement("select");
   voice_select.style.width="200px";
   voice_select.style.color="black";
   voice_select.style.borderRadius="10px";
@@ -467,7 +474,7 @@ function build_ui(){
     }
 
   }
-  populateVoicesList();
+  setTimeout(populateVoicesList,1000);
 
   voice_select_div =  document.createElement("div");
   voice_select_div.style.width="100%";
@@ -552,7 +559,6 @@ function build_ui(){
   optionsDiv.appendChild(commands_div);
   optionsDiv.appendChild(voice_select_div);
   optionsDiv.appendChild(autoread_div);
-  optionsDiv.appendChild(submit_personality);
   // Create a new div
   var bottomDiv = document.createElement("div");
   bottomDiv.classList.add("bottom-div");
@@ -594,11 +600,13 @@ function splitString(string, maxLength) {
   function addListeners(button, utterThis){
     console.log("Adding listeners")
     utterThis.onstart = (event) => {
+      isSpeaking=true;
       button.style.backgroundColor = "red";
       button.style.boxShadow = "2px 2px 0.5px #808080";
     };
     
     utterThis.onend = (event) => {
+      isSpeaking=false;
       button.style.backgroundColor = "";
       button.style.boxShadow = "";
     };
@@ -609,34 +617,34 @@ function splitString(string, maxLength) {
 function attachAudio_modules(div)
 {
     console.log("Adding audio tag")
-    if (div.parentNode.getElementsByClassName("audio_button").length>0){
+    if (div.parentNode.getElementsByClassName("audio-out-button").length>0){
       return;
     }
-    const audio_button = document.createElement("button");
-    audio_button.id = "audio_button"
-    audio_button.innerHTML = "🕪";
+    const audio_out_button = document.createElement("button");
+    audio_out_button.id = "audio-out-button"
+    audio_out_button.innerHTML = "🕪";
     div.classList.add("flex-1");
-    audio_button.classList.add("ml-2");
-    div.parentNode.appendChild(audio_button);
+    audio_out_button.classList.add("audio-out-button");
+    div.parentNode.appendChild(audio_out_button);
     
     function play_audio(){
       if(isSpeaking)
       {
         console.log("stopping audio");
 
-        audio_button.style.backgroundColor = "";
-        audio_button.style.boxShadow = "";
+        audio_out_button.style.backgroundColor = "";
+        audio_out_button.style.boxShadow = "";
         synth.cancel()
         isSpeaking= false;
       }
       else{
         console.log("starting audio");
         isSpeaking=true;
-        text=audio_wrapper.previousSibling.textContent;
+        text=audio_out_button.previousSibling.textContent;
         console.log(text)
     
     
-        const selectedOption = select.selectedOptions[0].getAttribute('data-name');
+        const selectedOption = voice_select.selectedOptions[0].getAttribute('data-name');
         var selectedVoice = null;
         console.log(`Found selected voice : ${selectedOption}`);
         for (let i = 0; i < voices.length ; i++) {
@@ -650,7 +658,7 @@ function attachAudio_modules(div)
           console.log("native");
           const utterThis = new SpeechSynthesisUtterance(text);
           utterThis.voice = selectedVoice
-          addListeners(audio_button, utterThis)
+          addListeners(audio_out_button, utterThis)
           synth.speak(utterThis); 
         }
         else{
@@ -659,13 +667,13 @@ function attachAudio_modules(div)
           texts.forEach((text)=>{
             const utterThis = new SpeechSynthesisUtterance(text);
             utterThis.voice = selectedVoice
-            addListeners(audio_button, utterThis)
+            addListeners(audio_out_button, utterThis)
             synth.speak(utterThis);   
           })
         }
       }
     }
-    audio_button.addEventListener("click", () => {
+    audio_out_button.addEventListener("click", () => {
       play_audio();
     });
     if(global["auto_audio"]){
@@ -684,16 +692,45 @@ function callback (mutationsList, observer) {
   try{
     if(lastDivWithText)
     {
-      if (lastDivWithText.parentNode.parentNode.parentNode.querySelector("svg") && !lastDivWithText.parentNode.parentNode.parentNode.querySelector("#audio_button") ) {
-        console.log("Ready");
-        attachAudio_modules(lastDivWithText)
-      }else{
-        console.log("not ready");
+      console.log(lastDivWithText.parentNode.parentNode.parentNode);
+      console.log(lastDivWithText.parentNode.parentNode.parentNode.querySelectorAll("button").length);
+      if (lastDivWithText.parentNode.parentNode.parentNode.querySelectorAll("button").length>0){
+        console.log("searching buttons")
+        parent = lastDivWithText.parentNode.parentNode.parentNode.querySelectorAll("button")[0].parentNode;
+        console.log(parent);
+        if(parent.classList.contains("visible"))
+        {
+          console.log("buttons found")
+          if (lastDivWithText.parentNode.getElementsByClassName("audio-out-button").length==0) {
+            console.log("The system is ready");
+            attachAudio_modules(lastDivWithText);
+            console.log("Added audio");
+          }else{
+            console.log("not ready");
+          }    
+        }
+        else{
+          console.log("Buttons not visible");
+        }
       }
     }
     else{
       console.log("No last div found");
     }  
+    const input =  document.querySelectorAll("input[type='text'], textarea")[0];
+    if(input.parentNode.getElementsByClassName("settings-btn").length==0){
+      console.log("Adding settings");
+      const settings_button = document.createElement("button")
+      settings_button.id ="settings-btn";
+      settings_button.innerHTML=`🪛`;
+      settings_button.classList.add("settings-btn")
+      settings_button.addEventListener('click',()=>{
+        floatingDiv.style.display="block";
+      })
+     
+      input.parentNode.insertBefore(settings_button, input.nextSibling);
+    }
+
 
   }
   catch{
@@ -707,7 +744,7 @@ function callback (mutationsList, observer) {
 window.addEventListener('load', (event) => {
     var main = document.querySelector("main");
     createWelcomeDialog();
-    build_ui();
+    setTimeout(build_ui,1000);
     console.log("Chatgpt Personality selector module");
    
     observer = new MutationObserver(callback);
