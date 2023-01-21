@@ -692,31 +692,16 @@ function callback (mutationsList, observer) {
   try{
     if(lastDivWithText)
     {
-      console.log(lastDivWithText.parentNode.parentNode.parentNode);
-      console.log(lastDivWithText.parentNode.parentNode.parentNode.querySelectorAll("button").length);
       if (lastDivWithText.parentNode.parentNode.parentNode.querySelectorAll("button").length>0){
-        console.log("searching buttons")
         parent = lastDivWithText.parentNode.parentNode.parentNode.querySelectorAll("button")[0].parentNode;
-        console.log(parent);
         if(parent.classList.contains("visible"))
         {
-          console.log("buttons found")
           if (lastDivWithText.parentNode.getElementsByClassName("audio-out-button").length==0) {
-            console.log("The system is ready");
             attachAudio_modules(lastDivWithText);
-            console.log("Added audio");
-          }else{
-            console.log("not ready");
-          }    
-        }
-        else{
-          console.log("Buttons not visible");
+          }   
         }
       }
     }
-    else{
-      console.log("No last div found");
-    }  
     const input =  document.querySelectorAll("input[type='text'], textarea")[0];
     if(input.parentNode.getElementsByClassName("settings-btn").length==0){
       console.log("Adding settings");
