@@ -176,7 +176,7 @@ function conditionChatGPT(results, query) {
     formattedResults = formattedResults + `Instructions:
     Act as an AI specialized in papers analysis and article generation.
     The AI knows how to write different text formats such as latex.
-    In addition to natural interaction, the AI can respond to those commands :
+    In addition to natural interaction, the AI can respond to those personality_select :
     summerize,mksurvey,showperspectives,critisize,list,latex.
     Make sure to cite results using [[number](URL)] notation after the reference.
     Be precise and use academic english.
@@ -217,9 +217,9 @@ async function api_search(query) {
 }
 
 
-var commands;
+var personality_select;
 function onSubmit(event) {
-    console.log(`On submit triggered with ${commands}`);
+    console.log(`On submit triggered with ${personality_select}`);
     floatingDiv.style.display="none";
     if (event.shiftKey && event.key === 'Enter') {
         console.log("shift detected");
@@ -232,7 +232,7 @@ function onSubmit(event) {
         isProcessing = true;
 
         try {
-            if(commands.value == "")
+            if(personality_select.value == "")
             {
                 let query = textarea.value;
                 if(query==="")
@@ -258,7 +258,7 @@ function onSubmit(event) {
             else
             {
                 console.log("Setting text data")
-                textarea.value=commands.value;
+                textarea.value=personality_select.value;
                 console.log("Pressig enter")
                 pressEnter();
             }
@@ -293,7 +293,7 @@ function build_persons_list()
     // Read the CSV file
     var fileUrl;
     fileUrl = chrome.runtime.getURL(`prompts_${lang_options[global.language].value}.csv`);
-    commands.innerHTML = '';
+    personality_select.innerHTML = '';
     console.log(fileUrl);
     // Use PapaParse to parse the CSV file
     fetch(fileUrl)
@@ -305,12 +305,12 @@ function build_persons_list()
             complete: function(results) {
                 // Iterate through the rows of the CSV file
                 results.data.forEach((row) => {
-                    // Add the act and prompt columns to the list of commands and options
+                    // Add the act and prompt columns to the list of personality_select and options
                     var optionElement = document.createElement("option");
                     optionElement.value = row.prompt;
                     optionElement.innerHTML = row.act;
                     optionElement.classList.add("text-white");
-                    commands.appendChild(optionElement);
+                    personality_select.appendChild(optionElement);
                     optionElement.style.color="black";
                 });
             },
@@ -328,17 +328,15 @@ function build_ui(){
   // Create the title bar div
   var titleBar = document.createElement("div");
   titleBar.classList.add("title-bar");
-  titleBar.innerHTML = "Title";
+  titleBar.innerHTML = "ChatGPT Personality selector";
 
   // Add the title bar as the first child of the floating div
   floatingDiv.insertBefore(titleBar, floatingDiv.firstChild);
 
   // Create the close button
   var closeButton = document.createElement("button");
+  closeButton.classList.add("close-button");
   closeButton.textContent = "X";
-  closeButton.style.position = "absolute";
-  closeButton.style.right = "10px";
-  closeButton.style.top = "10px";
 
   // Add a click event listener to the close button
   closeButton.addEventListener("click", function() {
@@ -351,9 +349,6 @@ function build_ui(){
   // Content
   var optionsDiv = document.createElement("div");
   optionsDiv.classList.add("content-div");
-  optionsDiv.id = "chatgpt-personality-selector-options";
-  optionsDiv.style.maxHeight = "300px";
-  optionsDiv.style.overflowY = "scroll";
 
   var divider = document.createElement("hr");
   floatingDiv.appendChild(divider);
@@ -364,23 +359,22 @@ function build_ui(){
   textarea = document.querySelector("textarea");
 
   var submit_personality = document.createElement("button");
+  submit_personality.classList.add("submit-personality")
+
   submit_personality.id = "submit-personality"
-  submit_personality.innerHTML=`<svg stroke="red" fill="red" stroke-width="0" viewBox="0 0 20 20" class="h-4 w-4 rotate-90" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path></svg>`
+  submit_personality.innerHTML=`🧠`
   submit_personality.addEventListener("click", onSubmit);
 
   language_div =  document.createElement("div");
-  language_div.style.width="100%";
+  language_div.classList.add("input-select-div");
+  
 
   language_label = document.createElement("label");
-  language_label.textContent="Language";
-  language_label.style.width = "100px";
+  language_label.classList.add("input-select-label");
+  language_label.innerText="Language";
 
   language_select = document.createElement("select");
-  language_select.style.marginLeft="5px";
-  language_select.style.width="300px";
-  language_select.style.color="black";
-  language_select.style.borderRadius="10px";
-  language_select.style.marginRight="20px";
+  language_select.classList.add("input-selects");
 
 
   language_div.appendChild(language_label)
@@ -404,46 +398,38 @@ function build_ui(){
     })
 
 
-  commands_div =  document.createElement("div");
-  commands_div.style.width="100%";
+  personality_select_div =  document.createElement("div");
+  personality_select_div.classList.add("input-select-div");
 
-  commands_label = document.createElement("label");
-  commands_label.textContent="Personality";
-  commands_label.style.width = "100px";
+  personality_select_label = document.createElement("label");
+  personality_select_label.classList.add("input-select-label");
+  personality_select_label.textContent="Personality";
 
 
 
-  commands = document.createElement("select");
-  commands.style.marginLeft="5px";
-  commands.style.width="300px";
-  commands.style.color="black";
-  commands.style.borderRadius="10px";
-  commands.style.marginRight="20px";
-  commands.addEventListener("change",()=>{
+  personality_select = document.createElement("select");
+  personality_select.classList.add("input-selects")
+  personality_select.addEventListener("change",()=>{
     global["selected_personality"]=this.selectedIndex;
     chrome.storage.sync.set({"global": global});
   });
-  commands.selectedIndex = global["selected_personality"]
+  personality_select.selectedIndex = global["selected_personality"]
 
 
 
   build_persons_list();
 
-  commands_div.appendChild(commands_label)
-  commands_div.appendChild(commands)
-  commands_div.appendChild(submit_personality)
+  personality_select_div.appendChild(personality_select_label)
+  personality_select_div.appendChild(personality_select)
   
 
 
   voice_select_label = document.createElement("label");
   voice_select_label.textContent="Voice";
-  voice_select_label.style.width="100px";
+  voice_select_label.classList.add("input-select-label");
 
   voice_select = document.createElement("select");
-  voice_select.style.width="200px";
-  voice_select.style.color="black";
-  voice_select.style.borderRadius="10px";
-  voice_select.style.marginRight="20px";
+  voice_select.classList.add("input-selects")
 
 
 
@@ -478,8 +464,7 @@ function build_ui(){
   setTimeout(populateVoicesList,1000);
 
   voice_select_div =  document.createElement("div");
-  voice_select_div.style.width="100%";
-  voice_select_div.style.display="flex";
+  voice_select_div.classList.add("input-select-div");
 
   voice_select_div.appendChild(voice_select_label)
   voice_select_div.appendChild(voice_select)
@@ -488,20 +473,16 @@ function build_ui(){
   // textarea.addEventListener("keydown", onSautoread
 
   autoread_div =  document.createElement("div");
-  autoread_div.style.width="100%";
-  autoread_div.style.display="flex";
+  autoread_div.classList.add("input-select-div");
   
   autoread_label = document.createElement("label");
+  autoread_label.classList.add("input-select-label");
   autoread_label.textContent="Autoread";
   
   autoread = document.createElement("input");
+  autoread.classList.add("input-checkbox");
   autoread.type="checkbox"
-  autoread.style.marginLeft="20px";
-  autoread.style.color="black";
-  autoread.style.borderRadius="10px";
-  autoread.style.marginRight="20px";
-  autoread.style.width="20px";
-  autoread.style.height="20px";
+
   
   autoread.addEventListener("click", function() {
       console.log(this.checked);
@@ -513,14 +494,10 @@ function build_ui(){
   autoread_div.appendChild(autoread)
 
 
-
-  var title = document.createElement("h4");
-  title.innerHTML = "ChatGPT Personality selector";
-  title.classList.add("text-white", "pb-4", "text-lg", "font-bold");
-
-  var credits = document.createElement("a");
-  credits.innerHTML = `<footer style="text-align:center;">
+  var credits = document.createElement("div");
+  credits.innerHTML = `<footer style="text-align:center;width:100%;">
   This app is built by ParisNeo with the help of ChatGPT<br>
+  <a class="link" href="https://github.com/ParisNeo/chatgpt-personality-selector/blob/main/README.md" target="_blank">Help</a>
   <div style="display:flex;flex:row;text-align:center;">
   <table width="100%">
   <tr>
@@ -550,23 +527,17 @@ function build_ui(){
 </div>  
 
 </footer>`;
-  credits.classList.add("text-sm", "text-gray-500");
+  credits.classList.add("text-footer");
 
-  
-
-  optionsDiv.style.width="100%";
-  optionsDiv.appendChild(title);
   optionsDiv.appendChild(language_div);
-  optionsDiv.appendChild(commands_div);
+  optionsDiv.appendChild(personality_select_div);
   optionsDiv.appendChild(voice_select_div);
+  
   optionsDiv.appendChild(autoread_div);
-  // Create a new div
-  var bottomDiv = document.createElement("div");
-  bottomDiv.classList.add("bottom-div");
-  bottomDiv.appendChild(credits);
+  optionsDiv.appendChild(submit_personality);
 
   // Append the new div to the floating div    
-  optionsDiv.appendChild(bottomDiv);
+  optionsDiv.appendChild(credits);
 
   console.log("Done updating ui")
 
@@ -703,18 +674,20 @@ function callback (mutationsList, observer) {
         }
       }
     }
-    const input =  document.querySelectorAll("input[type='text'], textarea")[0];
-    if(input.parentNode.getElementsByClassName("settings-btn").length==0){
+    var link = document.querySelector("a[href='https://discord.gg/openai']");
+    console.log("Adding settings menu")
+    if(link.parentNode.querySelector("#settings-btn")=== null){
       console.log("Adding settings");
       const settings_button = document.createElement("button")
       settings_button.id ="settings-btn";
-      settings_button.innerHTML=`🪛`;
-      settings_button.classList.add("settings-btn")
+
+      settings_button.innerHTML=`🪛 Personality`;
+      //settings_button.classList.add("flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm")
       settings_button.addEventListener('click',()=>{
         floatingDiv.style.display="block";
       })
      
-      input.parentNode.insertBefore(settings_button, input.nextSibling);
+      link.parentNode.insertBefore(settings_button, link.nextSibling);
     }
 
 

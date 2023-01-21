@@ -84,9 +84,13 @@ button:hover{
 }
 .close-button {
     position: absolute;
-    right: 10px;
-    top: 10px;
-    background-color: #444;
+    height: 45px;
+    right: 0px;
+    top: 0px;
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-top-right-radius: 10px;
     color: #fff;
     transition: background-color .2s;    
 }
@@ -111,31 +115,97 @@ button:hover{
 }
 
 .content-div{
-    margin-left: 10px;
-    margin-right: 10px;
+    padding: 10px;
+    left: 10%;
+    right: 10%;
+    width:100%;
+    display:flex;
+    flex-direction: column;
 }
+.text-footer{
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    padding: 10px;
 
+}
 .title-bar {
     height: 45px;
-    background-color: #333;
+    background-color: #444;
     color: #fff;    
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     padding-left: 20px;
     padding-top: 10px;
     font-weight: bold;
+    text-align: center;
 }
-.bottom-div {
-    position: absolute;
-    bottom: 0;
+.input-select-div{
+    display:block;
     margin: 10px;
+}
+
+.input-select-label{
+    width:30%;
+    padding-left: 10px;
+    left: 10px;
+}
+.input-selects{
+    position: absolute;
+    right: 10px;
+    width:70%;
+    color:black;
+    border-radius: 10px;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 10px;
+    padding-right: 10px;
+
+}
+.input-checkbox{
+    position: absolute;
+    margin: 10px;
+    padding: 10px;
+    right: 10px;
+    width:25px;
+    color:black;
+    border-radius: 10px;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.submit-personality{
+    right: 10px;
+    height: 50px;
+    width:100%;
+    text-align: center;
+    
+}
+.link{
+    color: aqua;
+    text-decoration: underline;
+}
+.link:link, .link:visited {
+    color: aquamarine;
+    text-decoration: underline;
 }
 form{
     order: 2;
 }
 
 .settings-btn{
-    width: 25px;
+    width: 100%;
 }
 
 
