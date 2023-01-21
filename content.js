@@ -220,6 +220,7 @@ async function api_search(query) {
 var commands;
 function onSubmit(event) {
     console.log(`On submit triggered with ${commands}`);
+    floatingDiv.style.display="none";
     if (event.shiftKey && event.key === 'Enter') {
         console.log("shift detected");
         return;
