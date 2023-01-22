@@ -37,16 +37,22 @@ var language_select ;
 
 function get_lastdiv_with_text(divs) {
   var lastDivWithText;
-  var main = document.querySelector("main");
-  var divs = main.querySelectorAll("div");
+  try{
+    var main = document.querySelector("main"); 
+    var divs = main.querySelectorAll("div");
+    
+    for (let i = 0; i < divs.length; i++) {
+        if (divs[i].childNodes.length === 1 && divs[i].childNodes[0].nodeType === 3) {
+          lastDivWithText = divs[i];
+        }
+        else if (divs[i].getElementsByTagName("p").length > 0) {
+          lastDivWithText = divs[i];
+        }
+    }
   
-  for (let i = 0; i < divs.length; i++) {
-      if (divs[i].childNodes.length === 1 && divs[i].childNodes[0].nodeType === 3) {
-        lastDivWithText = divs[i];
-      }
-      else if (divs[i].getElementsByTagName("p").length > 0) {
-        lastDivWithText = divs[i];
-      }
+  }
+  catch{
+
   }
   return lastDivWithText;
 }

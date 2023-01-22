@@ -10,7 +10,8 @@ There are some interesting text based games including dungeon and dragons (DnD) 
 
 To use the extension, users simply select the desired personality from the large set of options and press the validation button. The chatbot will then be instantly transformed and ready to perform the specific task with ease.
 
-
+# Usage
+![usage](/assets/chatgpt_use.jpg)
 # ChatGpt written ad to this extention
 Are you tired of using a generic chatbot that doesn't seem to understand your specific needs? Look no further, ChatGPT Personality Selector is the ultimate extension for customizing your chatbot experience on Google Chrome.
 
