@@ -11,7 +11,20 @@ There are some interesting text based games including dungeon and dragons (DnD) 
 To use the extension, users simply select the desired personality from the large set of options and press the validation button. The chatbot will then be instantly transformed and ready to perform the specific task with ease.
 
 # Usage
-![usage](/assets/chatgpt_use.jpg)
+![usage](/assets/chatgpt_use.png)
+Whan you install the extension, this UI will show up the next time you open up chatgpt website. As you can see, some elements are added to the UI. First, you have a new menue that shows the Personality selector settings dialog. You can also notice the apearance of a microphone near the input text and a speaker in the responses. As you have probably guessed, the microphone is used to input text by just speaking and the speaker reads the responses.
+
+The settings UI is intuitive and simple:
+- Select the language
+- Select the personality category
+- Select the personality
+- Press Apply
+
+
+You can activate autoread so that the text written by chatgpt will be automatically read when it is ready. This is useful for some applications such as playing Dungeons and dragons. It is always more pleasent to hear instead of reading.
+
+For some personalities, there is a disclaimer that you should read carefully to avoid the potential harm of over confidence like in doctor
+
 # ChatGpt written ad to this extention
 Are you tired of using a generic chatbot that doesn't seem to understand your specific needs? Look no further, ChatGPT Personality Selector is the ultimate extension for customizing your chatbot experience on Google Chrome.
 
