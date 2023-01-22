@@ -103,7 +103,7 @@ button:hover{
     display: flex;
     flex-direction: column;
     width: 500px;
-    height: 400px;
+    height: 450px;
     left: 50%;
     top: 50%;
     margin-left: -150px;
@@ -190,7 +190,9 @@ button:hover{
     height: 50px;
     width:100%;
     text-align: center;
-    
+    border:solid;
+    background-color: #888888;
+        
 }
 .link{
     color: aqua;
@@ -204,8 +206,10 @@ form{
     order: 2;
 }
 
-.settings-btn{
+.personality-settings{
     width: 100%;
+    text-align: left;
+    background-color: #888888;
 }
 
 

@@ -1,14 +1,16 @@
 let isProcessing = false;
 var global={
     "show_help_at_startup":true,
-    "selected_personality":"",
-    "language":"",
+    "selected_category":0,
+    "selected_personality":0,
+    "language":0,
     "voice":"",
     "auto_audio":false
   }
+
 var lang_options=[
-  { value: "fr-FR", label: "Français" },
   { value: "en-US", label: "English" },
+  { value: "fr-FR", label: "Français" },
   { value: "es-ES", label: "Español" },
 ];
 
@@ -32,10 +34,6 @@ let isSpeaking= false;
 
 var language_select ;
 
-
-chrome.storage.sync.get(["global"], (data) => {
-    global =  data.global ;
-});
 
 function get_lastdiv_with_text(divs) {
   var lastDivWithText;
@@ -115,51 +113,6 @@ function add_audio_in_ui()
 
 }
 
-function createWelcomeDialog() {
-
-    // Check if the user has chosen not to show the dialog again
-    if (global["show_help_at_startup"]) {
-        console.log("Adding dialog");
-        // Create the dialog
-        var dialog = document.createElement("div");
-        dialog.id = "my-dialog";
-        dialog.style.display = "block";
-
-        // Create the checkbox
-        var checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.id = "dont-show-again";
-
-        // Create the label
-        var label = document.createElement("label");
-        label.htmlFor = "dont-show-again";
-        label.innerText = "Don't show this again";
-
-        // Add the checkbox and label to the dialog
-        dialog.appendChild(checkbox);
-        dialog.appendChild(label);
-
-        // Add the dialog to the page
-        document.body.appendChild(dialog);
-
-        // Add an event listener to the checkbox to update the user's preference
-        checkbox.addEventListener("change", function() {
-            global["show_help_at_startup"] = !this.checked;
-            chrome.storage.sync.set({"global": global});
-        });
-
-        var closeBtn = document.createElement("button");
-        closeBtn.innerText = "Close";
-        dialog.appendChild(closeBtn);
-
-        closeBtn.addEventListener("click", function() {
-            dialog.style.display = "none";
-        });
-
-    }
-}
-
-
 function showErrorMessage(e) {
     console.log(e);
     var errorDiv = document.createElement("div");
@@ -174,23 +127,16 @@ function conditionChatGPT(results, query) {
     let formattedResults = `Current date: ${new Date().toLocaleDateString()}\n\nSubject :  ${query}.\n\n`;
     
     formattedResults = formattedResults + `Instructions:
-    Act as an AI specialized in papers analysis and article generation.
-    The AI knows how to write different text formats such as latex.
+    Act as an AI specialized in analyzing web search results.
+    The AI knows how to write different text formats such as latex, markdown and others.
     In addition to natural interaction, the AI can respond to those personality_select :
-    summerize,mksurvey,showperspectives,critisize,list,latex.
+    sentiment,summerize,mksurvey,showperspectives,critisize,list,latex,markdown.
     Make sure to cite results using [[number](URL)] notation after the reference.
     Be precise and use academic english.
     Stick to the user requests.
-    The user can formulate requests concerning the articles. respond in a formal manner.\n\n
-    After recovering the Articles web search data, just answer with welcome message and wait for the user command.\n
-    Welcome message "Welcome to SearchAI, your personal web browser.\nSubject recovered. Please specify one of the following options:
-    - summerize : Write a brief summary. \n
-    - mksurvey : Write a scientific survey (Write at least ${global["num_papers"]} paragraphs). \n
-    - showperspectives : Write a paragraph about the perspectives and future evolutions of the work.\n
-    - critisize : Criticise the subject.\n
-    - list : list articles source links. \n
-    - latex : write a latex article about the subject\n    
-    "`
+    The user can formulate requests concerning the search results. respond in a formal manner.\n\n
+    After recovering the web search data, just answer with welcome message and wait for the user command.\n
+    Start by showing the welcome message that explains what you can do in details.`
     formattedResults = formattedResults + `Articles web search results:\n\n`
     formattedResults = formattedResults + results.reduce((acc, result) => acc += `[${counter++}] "${result.body}"\nSource: ${result.href}\n\n`, "");
 
@@ -219,7 +165,10 @@ async function api_search(query) {
 
 var personality_select;
 function onSubmit(event) {
-    console.log(`On submit triggered with ${personality_select}`);
+  var personality_select = document.getElementById("personality-select");
+  personality = JSON.parse(personality_select.value);
+
+  console.log(`On submit triggered with ${personality}`);
     floatingDiv.style.display="none";
     if (event.shiftKey && event.key === 'Enter') {
         console.log("shift detected");
@@ -232,7 +181,7 @@ function onSubmit(event) {
         isProcessing = true;
 
         try {
-            if(personality_select.value == "")
+            if(personality.prompt == "")
             {
                 let query = textarea.value;
                 if(query==="")
@@ -258,7 +207,11 @@ function onSubmit(event) {
             else
             {
                 console.log("Setting text data")
-                textarea.value=personality_select.value;
+                if(personality.disclaimer!=="")
+                {
+                  alert(personality.disclaimer)
+                }
+                textarea.value=personality.prompt;
                 console.log("Pressig enter")
                 pressEnter();
             }
@@ -292,7 +245,9 @@ function build_persons_list()
 {
     // Read the CSV file
     var fileUrl;
+    console.log(`Loading prompts_${lang_options[global.language].value}.csv`)
     fileUrl = chrome.runtime.getURL(`prompts_${lang_options[global.language].value}.csv`);
+    category_select.innerHTML = '';
     personality_select.innerHTML = '';
     console.log(fileUrl);
     // Use PapaParse to parse the CSV file
@@ -301,20 +256,54 @@ function build_persons_list()
     .then((data) => {
         // Use PapaParse to parse the CSV file
         Papa.parse(data, {
-            header: true,
-            complete: function(results) {
-                // Iterate through the rows of the CSV file
-                results.data.forEach((row) => {
-                    // Add the act and prompt columns to the list of personality_select and options
-                    var optionElement = document.createElement("option");
-                    optionElement.value = row.prompt;
-                    optionElement.innerHTML = row.act;
-                    optionElement.classList.add("text-white");
-                    personality_select.appendChild(optionElement);
-                    optionElement.style.color="black";
-                });
-            },
-        })
+          header: true,
+          complete: function(results) {
+            var data = results.data;
+            var categories = Array.from(new Set(data.map(item => item.category)));
+      
+            // populate first select element with categories
+            var categorySelect = document.getElementById("category-select");
+            categories.forEach(function(category) {
+              var option = document.createElement("option");
+              option.value = category;
+              option.text = category;
+              categorySelect.add(option);
+            });
+      
+            // listen for change event on first select element
+            categorySelect.addEventListener("change", function() {
+              var selectedCategory = this.value;
+      
+              // filter data based on selected category
+              var personalities = data.filter(function(item) {
+                return item.category === selectedCategory;
+              }).map(function(item) {
+                return {"personality":item.personality,"disclaimer":item.disclaimer,"prompt":item.prompt};
+              });
+      
+              // remove duplicate personalities
+              personalities = Array.from(new Set(personalities));
+      
+              // populate second select element with personalities
+              var personalitySelect = document.getElementById("personality-select");
+              personalitySelect.innerHTML = "";
+              personalities.forEach(function(personality) {
+                var option = document.createElement("option");
+                option.value = JSON.stringify(personality);
+                option.text = personality.personality;
+                personalitySelect.add(option);
+              });
+              // set the last selected personality as the selected option
+              personalitySelect.selectedIndex = global.selected_personality;
+            });
+            // set the last selected category as the selected option
+            var selectedCategory = global.selected_category;
+            categorySelect.selectedIndex = selectedCategory;            
+            // trigger change event to populate the second select element
+            var event = new Event("change");
+            categorySelect.dispatchEvent(event); 
+          }
+        });
     });
 }
 
@@ -362,7 +351,7 @@ function build_ui(){
   submit_personality.classList.add("submit-personality")
 
   submit_personality.id = "submit-personality"
-  submit_personality.innerHTML=`🧠`
+  submit_personality.innerHTML=`🧠 Apply`
   submit_personality.addEventListener("click", onSubmit);
 
   language_div =  document.createElement("div");
@@ -375,6 +364,7 @@ function build_ui(){
 
   language_select = document.createElement("select");
   language_select.classList.add("input-selects");
+
 
 
   language_div.appendChild(language_label)
@@ -392,12 +382,36 @@ function build_ui(){
 
   language_select.addEventListener('change', (event) => {
       global["language"] = event.target.selectedIndex
+      global["selected_category"] = 0
+      global["selected_personality"] = 0   
+      
       chrome.storage.sync.set({"global": global});
       build_persons_list();
       console.log(event.target.value);
-    })
+    });
+
+  // Build category div
+  category_select_div =  document.createElement("div");
+  category_select_div.classList.add("input-select-div");
+
+  category_select_label = document.createElement("label");
+  category_select_label.classList.add("input-select-label");
+  category_select_label.textContent="Category";
 
 
+  category_select = document.createElement("select");
+  category_select.id = "category-select"
+  category_select.classList.add("input-selects")
+  category_select.addEventListener("change",()=>{
+    global["selected_category"]=this.selectedIndex;
+    chrome.storage.sync.set({"global": global});
+  });
+  category_select.selectedIndex = global["selected_category"]
+  category_select_div.appendChild(category_select_label)
+  category_select_div.appendChild(category_select)
+
+    
+  // Build personality div
   personality_select_div =  document.createElement("div");
   personality_select_div.classList.add("input-select-div");
 
@@ -408,6 +422,7 @@ function build_ui(){
 
 
   personality_select = document.createElement("select");
+  personality_select.id = "personality-select"
   personality_select.classList.add("input-selects")
   personality_select.addEventListener("change",()=>{
     global["selected_personality"]=this.selectedIndex;
@@ -416,12 +431,10 @@ function build_ui(){
   personality_select.selectedIndex = global["selected_personality"]
 
 
-
-  build_persons_list();
-
   personality_select_div.appendChild(personality_select_label)
   personality_select_div.appendChild(personality_select)
   
+  build_persons_list();
 
 
   voice_select_label = document.createElement("label");
@@ -494,6 +507,29 @@ function build_ui(){
   autoread_div.appendChild(autoread)
 
 
+  // Show at startup
+  show_at_startup_div =  document.createElement("div");
+  show_at_startup_div.classList.add("input-select-div");
+  
+  show_at_startup_label = document.createElement("label");
+  show_at_startup_label.classList.add("input-select-label");
+  show_at_startup_label.textContent="Show at startup?";
+  
+  show_at_startup = document.createElement("input");
+  show_at_startup.classList.add("input-checkbox");
+  show_at_startup.type="checkbox"
+
+  
+  show_at_startup.addEventListener("click", function() {
+      console.log(this.checked);
+      global["show_help_at_startup"]=this.checked;
+      chrome.storage.sync.set({"global": global});
+  });
+  show_at_startup.checked = global["show_help_at_startup"]
+  show_at_startup_div.appendChild(show_at_startup_label)
+  show_at_startup_div.appendChild(show_at_startup)
+
+
   var credits = document.createElement("div");
   credits.innerHTML = `<footer style="text-align:center;width:100%;">
   This app is built by ParisNeo with the help of ChatGPT<br>
@@ -530,10 +566,12 @@ function build_ui(){
   credits.classList.add("text-footer");
 
   optionsDiv.appendChild(language_div);
+  optionsDiv.appendChild(category_select_div);
   optionsDiv.appendChild(personality_select_div);
   optionsDiv.appendChild(voice_select_div);
   
   optionsDiv.appendChild(autoread_div);
+  optionsDiv.appendChild(show_at_startup_div);
   optionsDiv.appendChild(submit_personality);
 
   // Append the new div to the floating div    
@@ -541,7 +579,9 @@ function build_ui(){
 
   console.log("Done updating ui")
 
-
+  if(!global["show_help_at_startup"]){
+    floatingDiv.style.display="none";
+  }
   add_audio_in_ui();
 }
 // Audio code
@@ -675,13 +715,12 @@ function callback (mutationsList, observer) {
       }
     }
     var link = document.querySelector("a[href='https://discord.gg/openai']");
-    console.log("Adding settings menu")
     if(link.parentNode.querySelector("#settings-btn")=== null){
-      console.log("Adding settings");
       const settings_button = document.createElement("button")
+      settings_button.classList.add("personality-settings");
       settings_button.id ="settings-btn";
 
-      settings_button.innerHTML=`🪛 Personality`;
+      settings_button.innerHTML=`🪛 Personality settings`;
       //settings_button.classList.add("flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm")
       settings_button.addEventListener('click',()=>{
         floatingDiv.style.display="block";
@@ -702,7 +741,11 @@ function callback (mutationsList, observer) {
 
 window.addEventListener('load', (event) => {
     var main = document.querySelector("main");
-    createWelcomeDialog();
+    
+    chrome.storage.sync.get(["global"], (data) => {
+      global =  data.global ;
+    });
+
     setTimeout(build_ui,1000);
     console.log("Chatgpt Personality selector module");
    

@@ -3,7 +3,8 @@ chrome.runtime.onInstalled.addListener(() => {
         selected_personality:0,
         global:{
             "show_help_at_startup":true,
-            "selected_personality":0,
+            "selected_category":"",
+            "selected_personality":"",
             "language":0,
             "voice":"",
             "auto_audio":false
