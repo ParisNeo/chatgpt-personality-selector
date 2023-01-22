@@ -56,57 +56,74 @@ function add_audio_in_ui()
 {
   const inputs =  document.querySelectorAll("input[type='text'], textarea");
   inputs.forEach((input) => {
-
-    const audio_in_button = document.createElement("button");
-    audio_in_button.innerHTML = "🎤";
-
-    input.parentNode.insertBefore(audio_in_button, input.nextSibling);
-  
-  
     const wrapper = document.createElement("div");
     wrapper.classList.add("flex", "items-center");
-    input.classList.add("flex-1");
-    audio_in_button.classList.add("ml-2");
-    wrapper.appendChild(audio_in_button);
-    input.parentNode.insertBefore(wrapper, input);
-    input.parentNode.removeChild(input);
-    wrapper.appendChild(input);
+    var btn = document.querySelectorAll("#audio_in_tool");
+
+    var found = false;
+    // Iterate through the children
+    for (var i = 0; i < btn.length; i++) {
+      var child = btn[i];
+      // Check if the wrapper element contains the current child element
+      if (input.parentNode.contains(child)) {
+          found = true;
+      } 
+    }
+
+    console.log(`trying to add audio in button to ${btn}`);
+    if(!found)
+    {
+      const audio_in_button = document.createElement("button");
+      audio_in_button.id = "audio_in_tool";
+      audio_in_button.innerHTML = "🎤";
   
+      input.parentNode.insertBefore(audio_in_button, input.nextSibling);
+    
+    
+      input.classList.add("flex-1");
+      audio_in_button.classList.add("ml-2");
+      wrapper.appendChild(audio_in_button);
+      input.parentNode.insertBefore(wrapper, input);
+      input.parentNode.removeChild(input);
+      wrapper.appendChild(input);
+    
+    
+      
+      audio_in_button.addEventListener("click", () => {
+        if (isStarted) {
+          console.log("Stopping previous recognition")
+          recognition.stop();
+          isStarted = false;
+        } else {
+          console.log("Starting new recognition")
+          recognition.lang = language_select.value;
+          recognition.start();
+          isStarted = true;
+        }
+      });
+      
+      recognition.addEventListener("result", (event) => {
+          let transcript = "";
+          for (const result of event.results) {
+            transcript += result[0].transcript;
+          }
+          if(transcript!=""){
+            input.value = transcript;
+          }
+      });
+      
+      
+      recognition.addEventListener("start", () => {
+        audio_in_button.style.backgroundColor = "red";
+        audio_in_button.style.boxShadow = "2px 2px 0.5px #808080";
+      });
+      
+      recognition.addEventListener("end", () => {
+        audio_in_button.style.backgroundColor = "";
+        audio_in_button.style.boxShadow = "";
+      });  
   
-    
-    audio_in_button.addEventListener("click", () => {
-      if (isStarted) {
-        console.log("Stopping previous recognition")
-        recognition.stop();
-        isStarted = false;
-      } else {
-        console.log("Starting new recognition")
-        recognition.lang = language_select.value;
-        recognition.start();
-        isStarted = true;
-      }
-    });
-    
-    recognition.addEventListener("result", (event) => {
-        let transcript = "";
-        for (const result of event.results) {
-          transcript += result[0].transcript;
-        }
-        if(transcript!=""){
-          input.value = transcript;
-        }
-    });
-    
-    
-    recognition.addEventListener("start", () => {
-      audio_in_button.style.backgroundColor = "red";
-      audio_in_button.style.boxShadow = "2px 2px 0.5px #808080";
-    });
-    
-    recognition.addEventListener("end", () => {
-      audio_in_button.style.backgroundColor = "";
-      audio_in_button.style.boxShadow = "";
-    });  
+    }
 
 
   });
@@ -167,13 +184,9 @@ var personality_select;
 function onSubmit(event) {
   var personality_select = document.getElementById("personality-select");
   personality = JSON.parse(personality_select.value);
-
-  console.log(`On submit triggered with ${personality}`);
-    floatingDiv.style.display="none";
-    if (event.shiftKey && event.key === 'Enter') {
-        console.log("shift detected");
-        return;
-    }
+  textarea = document.querySelector("textarea");
+  console.log(`On submit triggered with ${JSON.stringify(personality)}`);
+  add_audio_in_ui();
     // Save global
     chrome.storage.sync.set({ "global": global });
     if (!isProcessing) {
@@ -214,12 +227,15 @@ function onSubmit(event) {
                 textarea.value=personality.prompt;
                 console.log("Pressig enter")
                 pressEnter();
+                isProcessing = false;
             }
         } catch (error) {
             isProcessing = false;
             showErrorMessage(error);
         }
     }
+    floatingDiv.style.display="none";
+
 }
 
 
@@ -623,8 +639,6 @@ function splitString(string, maxLength) {
       button.style.boxShadow = "";
     };
   }
-  
-  
 
 function attachAudio_modules(div)
 {
@@ -699,6 +713,7 @@ function callback (mutationsList, observer) {
   if (observer.isRunning || !mutationsList.length) {
     return;
   }
+  add_audio_in_ui();
   observer.isRunning = true;
   var lastDivWithText = get_lastdiv_with_text();
   try{
