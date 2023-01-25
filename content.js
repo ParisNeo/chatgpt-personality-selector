@@ -11,7 +11,6 @@ var global={
 var lang_options=[
   { value: "en-US", label: "English" },
   { value: "fr-FR", label: "Français" },
-  { value: "es-ES", label: "Español" },
 ];
 
 var floatingDiv;
@@ -145,7 +144,7 @@ function showErrorMessage(e) {
     setTimeout(() => { errorDiv.remove(); }, 5000);
 }
 
-function conditionChatGPT(results, query) {
+function conditionChatGPTEN(results, query) {
     let counter = 1;
     let formattedResults = `Current date: ${new Date().toLocaleDateString()}\n\nSubject :  ${query}.\n\n`;
     
@@ -154,7 +153,7 @@ function conditionChatGPT(results, query) {
     The AI knows how to write different text formats such as latex, markdown and others.
     In addition to natural interaction, the AI can respond to those personality_select :
     sentiment,summerize,mksurvey,showperspectives,critisize,list,latex,markdown.
-    Make sure to cite results using [[number](URL)] notation after the reference.
+    Make sure to cite results using [[number](URL)] notation after the reference to enable the users to click on it and view the source web page.
     Be precise and use academic english.
     Stick to the user requests.
     The user can formulate requests concerning the search results. respond in a formal manner.\n\n
@@ -164,6 +163,27 @@ function conditionChatGPT(results, query) {
     formattedResults = formattedResults + results.reduce((acc, result) => acc += `[${counter++}] "${result.body}"\nSource: ${result.href}\n\n`, "");
 
     textarea.value = formattedResults;
+}
+
+function conditionChatGPTFR(results, query) {
+  let counter = 1;
+  let formattedResults = `Date actuelle: ${new Date().toLocaleDateString()}\n\Sujet :  ${query}.\n\n`;
+  
+  formattedResults = formattedResults + `Instructions:
+  Agir en tant qu'IA spécialisée dans l'analyse des résultats de recherche sur le Web.
+  L'IA sait comment écrire différents formats de texte tels que latex, démarquage et autres.
+  En plus de l'interaction naturelle, l'IA peut répondre à ces personality_select :
+  sentiment, résumer, mksurvey, afficher les perspectives, critiquer, lister, latex, démarquage.
+  Assurez-vous de citer les résultats en utilisant la notation [[number](URL)] après la référence pour que les utilisateurs puissent consulter la page.
+  Soyez précis et utilisez un anglais académique.
+  Respectez les demandes des utilisateurs.
+  L'utilisateur peut formuler des requêtes concernant les résultats de la recherche. répondre de manière formelle.\n\n
+  Après avoir récupéré les données de recherche Web, répondez simplement avec un message de bienvenue et attendez la commande utilisateur.\n
+  Commencez par afficher le message de bienvenue qui explique ce que vous pouvez faire en détail.`
+  formattedResults = formattedResults + `Résultats de la recherche d'articles sur le Web :\n\n`
+  formattedResults = formattedResults + results.reduce((acc, result) => acc += `[${counter++}] "${result.body}"\nSource: ${result.href}\n\n`, "");
+
+  textarea.value = formattedResults;
 }
 
 function pressEnter() {
@@ -200,7 +220,7 @@ function onSubmit(event) {
         isProcessing = true;
 
         try {
-            if(personality.prompt == "")
+            if(personality.prompt == "<Search,EN>")
             {
                 let query = textarea.value;
                 if(query==="")
@@ -218,13 +238,37 @@ function onSubmit(event) {
     
                 api_search(query, global["num_papers"], global["content_type"], global["subject_area"], global["start_year"], global["end_year"], global["sort_by"])
                     .then(results => {
-                    conditionChatGPT(results, query);
+                    conditionChatGPTEN(results, query);
+                    pressEnter();
+                    isProcessing = false;
+                    });
+            }
+            else if(personality.prompt == "<Search,FR>")
+            {
+                let query = textarea.value;
+                if(query==="")
+                {
+                    alert("Pour utiliser cette personnalité, écrivez d'abord la requête que vous souhaitez rechercher sur Internet dans la zone de texte de la requête, puis appuyez sur le bouton rouge.\nAjoutez &max_results=<le nombre de résultats que vous recherchez> pour définir le nombre maximum de résultats attendus.\nExemple : &max_results=10 pour le définir sur 10")
+                }
+                textarea.value = "";
+    
+                query = query.trim();
+    
+                if (query === "") {
+                    isProcessing = false;
+                    return;
+                }
+    
+                api_search(query, global["num_papers"], global["content_type"], global["subject_area"], global["start_year"], global["end_year"], global["sort_by"])
+                    .then(results => {
+                    conditionChatGPTFR(results, query);
                     pressEnter();
                     isProcessing = false;
                     });
             }
             else
             {
+
                 console.log("Setting text data")
                 if(personality.disclaimer!=="")
                 {
