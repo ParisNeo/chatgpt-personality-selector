@@ -1,6 +1,8 @@
 # chatgpt-personality-selector
-![icon](/icon.png){:width="50px" height="50px"}
 
+<div style="width: 50px; height: 50px;">
+  <img src="icon.png">
+</div>
 
 [![GitHub release](https://badgen.net/github/release/ParisNeo/chatgpt-personality-selector)](https://github.com/ParisNeo/chatgpt-personality-selector/releases)
 [![GitHub license](https://badgen.net/github/license/ParisNeo/chatgpt-personality-selector)](https://github.com/ParisNeo/chatgpt-personality-selector/blob/master/LICENSE)
