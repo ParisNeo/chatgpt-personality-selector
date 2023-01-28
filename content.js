@@ -417,7 +417,7 @@ function build_ui(){
   submit_personality.classList.add("submit-personality")
 
   submit_personality.id = "submit-personality"
-  submit_personality.innerHTML=`🧠 Apply`
+  submit_personality.innerHTML=`🧠 Apply personality`
   submit_personality.addEventListener("click", onSubmit);
 
   language_div =  document.createElement("div");
