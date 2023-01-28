@@ -37,8 +37,14 @@ All you have to do is select the desired personality from our large set of optio
 Say goodbye to generic chatbots and hello to a personalized experience with ChatGPT Personality Selector. Download the extension now and experience the magic for yourself.
 
 # How to install?
+ChatGPT Personality Selector is now live on google chrome extension martket at this address:
 
-Installing ChatGPT Personality Selector on your machine is easy. Follow these simple steps:
+https://chrome.google.com/webstore/detail/chatgpt-personality-selec/jdmpccdlifdkhniemenfmieffkdblahk?hl=fr
+
+The extension is free, there are no ads, no cookies, no tipping. It is just a tool to show the possibilities that can be used with chatgpt. Its is also opensource under MIT licence, so you can vew the code, forck it, change it and do what you want with it.
+
+## Note
+You can also install the latest version of the extension firectly from github. This allows you to test the latest upgrades. Follow these simple steps:
 
 - Go to https://github.com/ParisNeo/chatgpt-personality-selector
 - Click on the "Clone or download" button and select "Download ZIP"
@@ -50,8 +56,7 @@ Installing ChatGPT Personality Selector on your machine is easy. Follow these si
 The ChatGPT Personality Selector extension should now be installed and ready to use on your Google Chrome browser.
 
 
-## Note
-Please note that since this extension is not available on the Google Chrome market, it may not receive automatic updates. To ensure you are using the latest version, check for updates on the GitHub page periodically.
+
 
 
 # Disclamer
