@@ -205,6 +205,11 @@ async function api_search(query) {
     return await response.json();
 }
 
+async function search(query) {
+  var url = "https://api.duckduckgo.com/?q=" + query + "&format=json";
+  return await fetch(url);
+}
+
 
 var personality_select;
 function onSubmit(event) {
@@ -236,7 +241,7 @@ function onSubmit(event) {
                     return;
                 }
     
-                api_search(query, global["num_papers"], global["content_type"], global["subject_area"], global["start_year"], global["end_year"], global["sort_by"])
+                api_search(query)
                     .then(results => {
                     conditionChatGPTEN(results, query);
                     pressEnter();
@@ -259,7 +264,7 @@ function onSubmit(event) {
                     return;
                 }
     
-                api_search(query, global["num_papers"], global["content_type"], global["subject_area"], global["start_year"], global["end_year"], global["sort_by"])
+                api_search(query)
                     .then(results => {
                     conditionChatGPTFR(results, query);
                     pressEnter();
