@@ -61,8 +61,8 @@ function add_audio_in_ui()
 {
   const inputs =  document.querySelectorAll("input[type='text'], textarea");
   inputs.forEach((input) => {
-    const wrapper = document.createElement("div");
-    wrapper.classList.add("flex", "items-center");
+    // const wrapper = document.createElement("div");
+    // wrapper.classList.add("flex", "items-center");
     var btn = document.querySelectorAll("#audio_in_tool");
 
     var found = false;
@@ -70,27 +70,28 @@ function add_audio_in_ui()
     for (var i = 0; i < btn.length; i++) {
       var child = btn[i];
       // Check if the wrapper element contains the current child element
-      if (input.parentNode.contains(child)) {
+      if (input.parentNode.parentNode.contains(child)) {
           found = true;
       } 
     }
 
-    console.log(`trying to add audio in button to ${btn}`);
+    console.log(`trying to add audio in button to ${input}`);
     if(!found)
     {
       const audio_in_button = document.createElement("button");
       audio_in_button.id = "audio_in_tool";
+      audio_in_button.classList.add("audio_btn");
       audio_in_button.innerHTML = "🎤";
   
-      input.parentNode.insertBefore(audio_in_button, input.nextSibling);
+      input.parentNode.parentNode.insertBefore(audio_in_button, input.parentNode);
     
     
       input.classList.add("flex-1");
       audio_in_button.classList.add("ml-2");
-      wrapper.appendChild(audio_in_button);
-      input.parentNode.insertBefore(wrapper, input);
-      input.parentNode.removeChild(input);
-      wrapper.appendChild(input);
+      //wrapper.appendChild(audio_in_button);
+      //input.parentNode.parentNode.insertBefore(wrapper, input);
+      //input.parentNode.removeChild(input);
+      //wrapper.appendChild(input);
     
     
       
@@ -458,6 +459,7 @@ function build_ui(){
       
       chrome.storage.sync.set({"global": global});
       build_persons_list();
+      populateVoicesList();
       console.log(event.target.value);
     });
 
@@ -476,6 +478,15 @@ function build_ui(){
   category_select.addEventListener("change",()=>{
     global["selected_category"]=this.selectedIndex;
     chrome.storage.sync.set({"global": global});
+    submit_personality=document.getElementById("submit-personality");
+    if(global["selected_category"]==0)
+    {
+      submit_personality.innerHTML=" Search"
+    }
+    else
+    {
+      submit_personality.innerHTML=`🧠 Apply personality`
+    }
   });
   category_select.selectedIndex = global["selected_category"]
   category_select_div.appendChild(category_select_label)
@@ -521,17 +532,21 @@ function build_ui(){
   function populateVoicesList() {
     console.log("Populating the list of voices")
     voices = synth.getVoices();
+    console.log(`language : ${lang_options[global["language"]].value}`)
     for (let i = 0; i < voices.length ; i++) {
-      const option = document.createElement('option');
-      option.textContent = `${voices[i].name} (${voices[i].lang})`;
-  
-      if (voices[i].default) {
-        option.textContent += ' — DEFAULT';
+      if(voices[i].lang.startsWith(lang_options[global["language"]].value.substring(0,2)))
+      {
+        const option = document.createElement('option');
+        option.textContent = `${voices[i].name} (${voices[i].lang})`;
+    
+        if (voices[i].default) {
+          option.textContent += ' — DEFAULT';
+        }
+    
+        option.setAttribute('data-lang', voices[i].lang);
+        option.setAttribute('data-name', voices[i].name);
+        voice_select.appendChild(option);  
       }
-  
-      option.setAttribute('data-lang', voices[i].lang);
-      option.setAttribute('data-name', voices[i].name);
-      voice_select.appendChild(option);
     } 
     voice_select.addEventListener("change", function() {
       // Code to execute when the voice_selected option changes
@@ -703,6 +718,7 @@ function attachAudio_modules(div)
     }
     const audio_out_button = document.createElement("button");
     audio_out_button.id = "audio-out-button"
+    audio_out_button.classList.add("audio_btn");
     audio_out_button.innerHTML = "🕪";
     div.classList.add("flex-1");
     audio_out_button.classList.add("audio-out-button");
