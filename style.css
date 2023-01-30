@@ -249,3 +249,9 @@ select {
     color: black !important; /* set the text color */
     background-color: lightgray !important; /* set the background color */
   }
+
+
+.audio_btn{
+    border-style: solid;
+    border-radius: 10px;
+}
