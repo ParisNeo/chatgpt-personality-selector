@@ -345,6 +345,17 @@ function build_persons_list()
             // listen for change event on first select element
             categorySelect.addEventListener("change", function() {
               var selectedCategory = this.value;
+              submit_personality=document.getElementById("submit-personality");
+              console.log(`Selected category :${this.selectedIndex}`)
+              if(this.selectedIndex==0)
+              {
+                console.log("changing text to search")
+                submit_personality.innerHTML="🔍 Search"
+              }
+              else
+              {
+                submit_personality.innerHTML=`🧠 Apply personality`
+              }
       
               // filter data based on selected category
               var personalities = data.filter(function(item) {
@@ -477,16 +488,9 @@ function build_ui(){
   category_select.classList.add("input-selects")
   category_select.addEventListener("change",()=>{
     global["selected_category"]=this.selectedIndex;
-    chrome.storage.sync.set({"global": global});
-    submit_personality=document.getElementById("submit-personality");
-    if(global["selected_category"]==0)
-    {
-      submit_personality.innerHTML=" Search"
-    }
-    else
-    {
-      submit_personality.innerHTML=`🧠 Apply personality`
-    }
+    chrome.storage.sync.set({"global": global});   
+    
+
   });
   category_select.selectedIndex = global["selected_category"]
   category_select_div.appendChild(category_select_label)
