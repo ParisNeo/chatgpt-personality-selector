@@ -46,7 +46,7 @@ https://chrome.google.com/webstore/detail/chatgpt-personality-selec/jdmpccdlifdk
 The extension is free, there are no ads, no cookies, no tipping. It is just a tool to show the possibilities that can be used with chatgpt. Its is also opensource under MIT licence, so you can vew the code, forck it, change it and do what you want with it.
 
 ## Note
-You can also install the latest version of the extension firectly from github. This allows you to test the latest upgrades. Follow these simple steps:
+You can also install the latest version of the extension directly from github. This allows you to test the latest upgrades. Follow these simple steps:
 
 - Go to https://github.com/ParisNeo/chatgpt-personality-selector
 - Click on the "Clone or download" button and select "Download ZIP"
