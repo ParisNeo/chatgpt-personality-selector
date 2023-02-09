@@ -20,7 +20,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install pandas transformers
+        pip install pandas torch transformers
 
     - name: Run script
       run: |
