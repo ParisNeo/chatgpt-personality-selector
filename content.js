@@ -1,14 +1,14 @@
 let isProcessing = false;
-var global={
-    "show_help_at_startup":true,
-    "selected_category":0,
-    "selected_personality":0,
-    "language":0,
-    "voice":"",
-    "auto_audio":false
-  }
+var global = {
+  show_help_at_startup: true,
+  selected_category: 0,
+  selected_personality: 0,
+  language: 0,
+  voice: "",
+  auto_audio: false,
+};
 
-var lang_options=[
+var lang_options = [
   { value: "en-US", label: "English" },
   { value: "fr-FR", label: "Français" },
 ];
@@ -27,39 +27,34 @@ const SpeechRecognition = window.SpeechRecognition || webkitSpeechRecognition;
 const recognition = new SpeechRecognition();
 recognition.continuous = true;
 recognition.interimResults = true;
-recognition.maxAlternatives = 10
+recognition.maxAlternatives = 10;
 let isStarted = false;
-let isSpeaking= false;
+let isSpeaking = false;
 
-var language_select ;
-
+var language_select;
 
 function get_lastdiv_with_text(divs) {
   var lastDivWithText;
-  try{
-    var main = document.querySelector("main"); 
+  try {
+    var main = document.querySelector("main");
     var divs = main.querySelectorAll("div");
-    
-    for (let i = 0; i < divs.length; i++) {
-        if (divs[i].childNodes.length === 1 && divs[i].childNodes[0].nodeType === 3) {
-          lastDivWithText = divs[i];
-        }
-        else if (divs[i].getElementsByTagName("p").length > 0) {
-          lastDivWithText = divs[i];
-        }
-    }
-  
-  }
-  catch{
 
-  }
+    for (let i = 0; i < divs.length; i++) {
+      if (
+        divs[i].childNodes.length === 1 &&
+        divs[i].childNodes[0].nodeType === 3
+      ) {
+        lastDivWithText = divs[i];
+      } else if (divs[i].getElementsByTagName("p").length > 0) {
+        lastDivWithText = divs[i];
+      }
+    }
+  } catch {}
   return lastDivWithText;
 }
 
-
-function add_audio_in_ui()
-{
-  const inputs =  document.querySelectorAll("input[type='text'], textarea");
+function add_audio_in_ui() {
+  const inputs = document.querySelectorAll("input[type='text'], textarea");
   inputs.forEach((input) => {
     // const wrapper = document.createElement("div");
     // wrapper.classList.add("flex", "items-center");
@@ -71,85 +66,98 @@ function add_audio_in_ui()
       var child = btn[i];
       // Check if the wrapper element contains the current child element
       if (input.parentNode.parentNode.contains(child)) {
-          found = true;
-      } 
+        found = true;
+      }
     }
 
     console.log(`trying to add audio in button to ${input}`);
-    if(!found)
-    {
+    if (!found) {
       const audio_in_button = document.createElement("button");
       audio_in_button.id = "audio_in_tool";
       audio_in_button.classList.add("audio_btn");
       audio_in_button.innerHTML = "🎤";
-  
-      input.parentNode.parentNode.insertBefore(audio_in_button, input.parentNode);
-    
-    
+
+      input.parentNode.parentNode.insertBefore(
+        audio_in_button,
+        input.parentNode
+      );
+
       input.classList.add("flex-1");
       audio_in_button.classList.add("ml-2");
       //wrapper.appendChild(audio_in_button);
       //input.parentNode.parentNode.insertBefore(wrapper, input);
       //input.parentNode.removeChild(input);
       //wrapper.appendChild(input);
-    
-    
-      
+
       audio_in_button.addEventListener("click", () => {
         if (isStarted) {
-          console.log("Stopping previous recognition")
+          console.log("Stopping previous recognition");
           recognition.stop();
           isStarted = false;
         } else {
-          console.log("Starting new recognition")
+          console.log("Starting new recognition");
           recognition.lang = language_select.value;
           recognition.start();
           isStarted = true;
         }
       });
-      
+
       recognition.addEventListener("result", (event) => {
-          let transcript = "";
-          for (const result of event.results) {
-            transcript += result[0].transcript;
-          }
-          if(transcript!=""){
-            input.value = transcript;
-          }
+        let transcript = "";
+        for (const result of event.results) {
+          transcript += result[0].transcript;
+        }
+        if (transcript != "") {
+          input.value = transcript;
+        }
       });
-      
-      
+
       recognition.addEventListener("start", () => {
         audio_in_button.style.backgroundColor = "red";
         audio_in_button.style.boxShadow = "2px 2px 0.5px #808080";
       });
-      
+
       recognition.addEventListener("end", () => {
         audio_in_button.style.backgroundColor = "";
         audio_in_button.style.boxShadow = "";
-      });  
-  
+      });
     }
-
-
   });
-
 }
 
 function showErrorMessage(e) {
-    console.log(e);
-    var errorDiv = document.createElement("div");
-    errorDiv.classList.add("chatgpt-personality-selector-error", "absolute", "bottom-0", "right-1", "text-white", "bg-red-500", "p-4", "rounded-lg", "mb-4", "mr-4", "text-sm");
-    errorDiv.innerHTML = "<b>An error occurred</b><br>" + e + "<br><br>Check the console for more details.";
-    document.body.appendChild(errorDiv);
-    setTimeout(() => { errorDiv.remove(); }, 5000);
+  console.log(e);
+  var errorDiv = document.createElement("div");
+  errorDiv.classList.add(
+    "chatgpt-personality-selector-error",
+    "absolute",
+    "bottom-0",
+    "right-1",
+    "text-white",
+    "bg-red-500",
+    "p-4",
+    "rounded-lg",
+    "mb-4",
+    "mr-4",
+    "text-sm"
+  );
+  errorDiv.innerHTML =
+    "<b>An error occurred</b><br>" +
+    e +
+    "<br><br>Check the console for more details.";
+  document.body.appendChild(errorDiv);
+  setTimeout(() => {
+    errorDiv.remove();
+  }, 5000);
 }
 
 function conditionChatGPTEN(results, query) {
-    let counter = 1;
-    let formattedResults = `Current date: ${new Date().toLocaleDateString()}\n\nSubject :  ${query}.\n\n`;
-    
-    formattedResults = formattedResults + `Instructions:
+  let counter = 1;
+  let formattedResults = `Current date: ${new Date().toLocaleDateString()}\n\nSubject :  ${query}.\n\n`;
+
+  formattedResults =
+    formattedResults +
+    `Instructions:
     Act as an AI specialized in analyzing web search results.
     The AI knows how to write different text formats such as latex, markdown and others.
     In addition to natural interaction, the AI can respond to those personality_select :
@@ -159,18 +167,26 @@ function conditionChatGPTEN(results, query) {
     Stick to the user requests.
     The user can formulate requests concerning the search results. respond in a formal manner.\n\n
     After recovering the web search data, just answer with welcome message and wait for the user command.\n
-    Start by showing the welcome message that explains what you can do in details.`
-    formattedResults = formattedResults + `Articles web search results:\n\n`
-    formattedResults = formattedResults + results.reduce((acc, result) => acc += `[${counter++}] "${result.body}"\nSource: ${result.href}\n\n`, "");
+    Start by showing the welcome message that explains what you can do in details.`;
+  formattedResults = formattedResults + `Articles web search results:\n\n`;
+  formattedResults =
+    formattedResults +
+    results.reduce(
+      (acc, result) =>
+        (acc += `[${counter++}] "${result.body}"\nSource: ${result.href}\n\n`),
+      ""
+    );
 
-    textarea.value = formattedResults;
+  textarea.value = formattedResults;
 }
 
 function conditionChatGPTFR(results, query) {
   let counter = 1;
   let formattedResults = `Date actuelle: ${new Date().toLocaleDateString()}\n\Sujet :  ${query}.\n\n`;
-  
-  formattedResults = formattedResults + `Instructions:
+
+  formattedResults =
+    formattedResults +
+    `Instructions:
   Agir en tant qu'IA spécialisée dans l'analyse des résultats de recherche sur le Web.
   L'IA sait comment écrire différents formats de texte tels que latex, démarquage et autres.
   En plus de l'interaction naturelle, l'IA peut répondre à ces personality_select :
@@ -180,37 +196,43 @@ function conditionChatGPTFR(results, query) {
   Respectez les demandes des utilisateurs.
   L'utilisateur peut formuler des requêtes concernant les résultats de la recherche. répondre de manière formelle.\n\n
   Après avoir récupéré les données de recherche Web, répondez simplement avec un message de bienvenue et attendez la commande utilisateur.\n
-  Commencez par afficher le message de bienvenue qui explique ce que vous pouvez faire en détail.`
-  formattedResults = formattedResults + `Résultats de la recherche d'articles sur le Web :\n\n`
-  formattedResults = formattedResults + results.reduce((acc, result) => acc += `[${counter++}] "${result.body}"\nSource: ${result.href}\n\n`, "");
+  Commencez par afficher le message de bienvenue qui explique ce que vous pouvez faire en détail.`;
+  formattedResults =
+    formattedResults + `Résultats de la recherche d'articles sur le Web :\n\n`;
+  formattedResults =
+    formattedResults +
+    results.reduce(
+      (acc, result) =>
+        (acc += `[${counter++}] "${result.body}"\nSource: ${result.href}\n\n`),
+      ""
+    );
 
   textarea.value = formattedResults;
 }
 
 function pressEnter() {
-    textarea.focus();
-    const enterEvent = new KeyboardEvent('keydown', {
-        bubbles: true,
-        cancelable: true,
-        key: 'Enter',
-        code: 'Enter'
-    });
-    textarea.dispatchEvent(enterEvent);
+  textarea.focus();
+  const enterEvent = new KeyboardEvent("keydown", {
+    bubbles: true,
+    cancelable: true,
+    key: "Enter",
+    code: "Enter",
+  });
+  textarea.dispatchEvent(enterEvent);
 }
 
 // use &max_results= to set the maximum number of results expoected
 async function api_search(query) {
-    var url = `https://ddg-webapp-aagd.vercel.app/search?&q=${query}`;
-    console.log(url);
-    const response = await fetch(url);
-    return await response.json();
+  var url = `https://ddg-webapp-aagd.vercel.app/search?&q=${query}`;
+  console.log(url);
+  const response = await fetch(url);
+  return await response.json();
 }
 
 async function search(query) {
   var url = "https://api.duckduckgo.com/?q=" + query + "&format=json";
   return await fetch(url);
 }
-
 
 var personality_select;
 function onSubmit(event) {
@@ -219,92 +241,89 @@ function onSubmit(event) {
   textarea = document.querySelector("textarea");
   console.log(`On submit triggered with ${JSON.stringify(personality)}`);
   add_audio_in_ui();
-    // Save global
-    chrome.storage.sync.set({ "global": global });
-    if (!isProcessing) {
-        console.log("Starting")
-        isProcessing = true;
+  // Save global
+  chrome.storage.sync.set({ global: global });
+  if (!isProcessing) {
+    console.log("Starting");
+    isProcessing = true;
 
-        try {
-            if(personality.prompt == "<Search,EN>")
-            {
-                let query = textarea.value;
-                if(query==="")
-                {
-                    alert("To use this personality, first write the query you want to search on the internet in the query textarea then press the Apply personality button.\nAdd &max_results=<the number of results you seek> to set the maximum number of results expoected.\nExample: &max_results=10 to set it to 10")
-                }
-                textarea.value = "";
-    
-                query = query.trim();
-    
-                if (query === "") {
-                    isProcessing = false;
-                    return;
-                }
-    
-                api_search(query)
-                    .then(results => {
-                    conditionChatGPTEN(results, query);
-                    pressEnter();
-                    isProcessing = false;
-                    });
-            }
-            else if(personality.prompt == "<Search,FR>")
-            {
-                let query = textarea.value;
-                if(query==="")
-                {
-                    alert("Pour utiliser cette personnalité, écrivez d'abord la requête que vous souhaitez rechercher sur Internet dans la zone de texte de la requête, puis appuyez sur le bouton Apply personality.\nAjoutez &max_results=<le nombre de résultats que vous recherchez> pour définir le nombre maximum de résultats attendus.\nExemple : &max_results=10 pour le définir sur 10")
-                }
-                textarea.value = "";
-    
-                query = query.trim();
-    
-                if (query === "") {
-                    isProcessing = false;
-                    return;
-                }
-    
-                api_search(query)
-                    .then(results => {
-                    conditionChatGPTFR(results, query);
-                    pressEnter();
-                    isProcessing = false;
-                    });
-            }
-            else
-            {
-
-                console.log("Setting text data")
-                if(personality.disclaimer!=="")
-                {
-                  alert(personality.disclaimer)
-                }
-                textarea.value=personality.prompt;
-                console.log("Pressig enter")
-                pressEnter();
-                isProcessing = false;
-            }
-        } catch (error) {
-            isProcessing = false;
-            showErrorMessage(error);
+    try {
+      if (personality.prompt == "<Search,EN>") {
+        let query = textarea.value;
+        if (query === "") {
+          alert(
+            "To use this personality, first write the query you want to search on the internet in the query textarea then press the Apply personality button.\nAdd &max_results=<the number of results you seek> to set the maximum number of results expoected.\nExample: &max_results=10 to set it to 10"
+          );
         }
-    }
-    floatingDiv.style.display="none";
+        textarea.value = "";
 
+        query = query.trim();
+
+        if (query === "") {
+          isProcessing = false;
+          return;
+        }
+
+        api_search(query).then((results) => {
+          conditionChatGPTEN(results, query);
+          pressEnter();
+          isProcessing = false;
+        });
+      } else if (personality.prompt == "<Search,FR>") {
+        let query = textarea.value;
+        if (query === "") {
+          alert(
+            "Pour utiliser cette personnalité, écrivez d'abord la requête que vous souhaitez rechercher sur Internet dans la zone de texte de la requête, puis appuyez sur le bouton Apply personality.\nAjoutez &max_results=<le nombre de résultats que vous recherchez> pour définir le nombre maximum de résultats attendus.\nExemple : &max_results=10 pour le définir sur 10"
+          );
+        }
+        textarea.value = "";
+
+        query = query.trim();
+
+        if (query === "") {
+          isProcessing = false;
+          return;
+        }
+
+        api_search(query).then((results) => {
+          conditionChatGPTFR(results, query);
+          pressEnter();
+          isProcessing = false;
+        });
+      } else {
+        console.log("Setting text data");
+        if (personality.disclaimer !== "") {
+          alert(personality.disclaimer);
+        }
+        textarea.value = personality.prompt;
+        console.log("Pressig enter");
+        pressEnter();
+        isProcessing = false;
+      }
+    } catch (error) {
+      isProcessing = false;
+      showErrorMessage(error);
+    }
+  }
+  floatingDiv.style.display = "none";
 }
 
-
-function build_option(option_name, select_options_list){
+function build_option(option_name, select_options_list) {
   var dropDown = document.createElement("select");
-  dropDown.classList.add("text-white", "ml-0", "bg-gray-900", "border", "w-full");
+  dropDown.classList.add(
+    "text-white",
+    "ml-0",
+    "bg-gray-900",
+    "border",
+    "w-full"
+  );
 
   select_options_list.forEach(function (option) {
-      var optionElement = document.createElement("option");
-      optionElement.value = option.value;
-      optionElement.innerHTML = option.label;
-      optionElement.classList.add("text-white");
-      dropDown.appendChild(optionElement);
+    var optionElement = document.createElement("option");
+    optionElement.value = option.value;
+    optionElement.innerHTML = option.label;
+    optionElement.classList.add("text-white");
+    dropDown.appendChild(optionElement);
   });
 
   dropDown.onchange = function () {
@@ -313,85 +332,91 @@ function build_option(option_name, select_options_list){
   return dropDown;
 }
 
-function build_persons_list()
-{
-    // Read the CSV file
-    var fileUrl;
-    console.log(`Loading prompts_${lang_options[global.language].value}.csv`)
-    fileUrl = chrome.runtime.getURL(`prompts_${lang_options[global.language].value}.csv`);
-    category_select.innerHTML = '';
-    personality_select.innerHTML = '';
-    console.log(fileUrl);
-    // Use PapaParse to parse the CSV file
-    fetch(fileUrl)
+function build_persons_list() {
+  // Read the CSV file
+  var fileUrl;
+  console.log(`Loading prompts_${lang_options[global.language].value}.csv`);
+  fileUrl = chrome.runtime.getURL(
+    `prompts_${lang_options[global.language].value}.csv`
+  );
+  category_select.innerHTML = "";
+  personality_select.innerHTML = "";
+  console.log(fileUrl);
+  // Use PapaParse to parse the CSV file
+  fetch(fileUrl)
     .then((response) => response.text())
     .then((data) => {
-        // Use PapaParse to parse the CSV file
-        Papa.parse(data, {
-          header: true,
-          complete: function(results) {
-            var data = results.data;
-            var categories = Array.from(new Set(data.map(item => item.category)));
-      
-            // populate first select element with categories
-            var categorySelect = document.getElementById("category-select");
-            categories.forEach(function(category) {
-              var option = document.createElement("option");
-              option.value = category;
-              option.text = category;
-              categorySelect.add(option);
-            });
-      
-            // listen for change event on first select element
-            categorySelect.addEventListener("change", function() {
-              var selectedCategory = this.value;
-              submit_personality=document.getElementById("submit-personality");
-              console.log(`Selected category :${this.selectedIndex}`)
-              if(this.selectedIndex==0)
-              {
-                console.log("changing text to search")
-                submit_personality.innerHTML="🔍 Search"
-              }
-              else
-              {
-                submit_personality.innerHTML=`🧠 Apply personality`
-              }
-      
-              // filter data based on selected category
-              var personalities = data.filter(function(item) {
+      // Use PapaParse to parse the CSV file
+      Papa.parse(data, {
+        header: true,
+        complete: function (results) {
+          var data = results.data;
+          var categories = Array.from(
+            new Set(data.map((item) => item.category))
+          );
+
+          // populate first select element with categories
+          var categorySelect = document.getElementById("category-select");
+          categories.forEach(function (category) {
+            var option = document.createElement("option");
+            option.value = category;
+            option.text = category;
+            categorySelect.add(option);
+          });
+
+          // listen for change event on first select element
+          categorySelect.addEventListener("change", function () {
+            var selectedCategory = this.value;
+            submit_personality = document.getElementById("submit-personality");
+            console.log(`Selected category :${this.selectedIndex}`);
+            if (this.selectedIndex == 0) {
+              console.log("changing text to search");
+              submit_personality.innerHTML = "🔍 Search";
+            } else {
+              submit_personality.innerHTML = `🧠 Apply personality`;
+            }
+
+            // filter data based on selected category
+            var personalities = data
+              .filter(function (item) {
                 return item.category === selectedCategory;
-              }).map(function(item) {
-                return {"personality":item.personality,"disclaimer":item.disclaimer,"prompt":item.prompt};
+              })
+              .map(function (item) {
+                return {
+                  personality: item.personality,
+                  disclaimer: item.disclaimer,
+                  prompt: item.prompt,
+                };
               });
-      
-              // remove duplicate personalities
-              personalities = Array.from(new Set(personalities));
-      
-              // populate second select element with personalities
-              var personalitySelect = document.getElementById("personality-select");
-              personalitySelect.innerHTML = "";
-              personalities.forEach(function(personality) {
-                var option = document.createElement("option");
-                option.value = JSON.stringify(personality);
-                option.text = personality.personality;
-                personalitySelect.add(option);
-              });
-              // set the last selected personality as the selected option
-              personalitySelect.selectedIndex = global.selected_personality;
+
+            // remove duplicate personalities
+            personalities = Array.from(new Set(personalities));
+
+            // populate second select element with personalities
+            var personalitySelect =
+              document.getElementById("personality-select");
+            personalitySelect.innerHTML = "";
+            personalities.forEach(function (personality) {
+              var option = document.createElement("option");
+              option.value = JSON.stringify(personality);
+              option.text = personality.personality;
+              personalitySelect.add(option);
             });
-            // set the last selected category as the selected option
-            var selectedCategory = global.selected_category;
-            categorySelect.selectedIndex = selectedCategory;            
-            // trigger change event to populate the second select element
-            var event = new Event("change");
-            categorySelect.dispatchEvent(event); 
-          }
-        });
+            // set the last selected personality as the selected option
+            personalitySelect.selectedIndex = global.selected_personality;
+          });
+          // set the last selected category as the selected option
+          var selectedCategory = global.selected_category;
+          categorySelect.selectedIndex = selectedCategory;
+          // trigger change event to populate the second select element
+          var event = new Event("change");
+          categorySelect.dispatchEvent(event);
+        },
+      });
     });
 }
 
-
-function build_ui(){
+function build_ui() {
   console.log("building ui");
   // Create the main div
   floatingDiv = document.createElement("div");
@@ -411,8 +436,8 @@ function build_ui(){
   closeButton.textContent = "X";
 
   // Add a click event listener to the close button
-  closeButton.addEventListener("click", function() {
-    floatingDiv.style.display="none";
+  closeButton.addEventListener("click", function () {
+    floatingDiv.style.display = "none";
   });
 
   // Append the close button to the main div
@@ -427,198 +452,179 @@ function build_ui(){
   floatingDiv.appendChild(optionsDiv);
   console.log("Updating UI");
 
- 
   textarea = document.querySelector("textarea");
 
   var submit_personality = document.createElement("button");
-  submit_personality.classList.add("submit-personality")
+  submit_personality.classList.add("submit-personality");
 
-  submit_personality.id = "submit-personality"
-  submit_personality.innerHTML=`🧠 Apply personality`
+  submit_personality.id = "submit-personality";
+  submit_personality.innerHTML = `🧠 Apply personality`;
   submit_personality.addEventListener("click", onSubmit);
 
-  language_div =  document.createElement("div");
+  language_div = document.createElement("div");
   language_div.classList.add("input-select-div");
-  
 
   language_label = document.createElement("label");
   language_label.classList.add("input-select-label");
-  language_label.innerText="Language";
+  language_label.innerText = "Language";
 
   language_select = document.createElement("select");
   language_select.classList.add("input-selects");
 
-
-
-  language_div.appendChild(language_label)
-  language_div.appendChild(language_select)
-
+  language_div.appendChild(language_label);
+  language_div.appendChild(language_select);
 
   lang_options.forEach((row) => {
-      var optionElement = document.createElement("option");
-      optionElement.value = row.value;
-      optionElement.innerHTML = row.label;
-      optionElement.classList.add("text-white");
-      language_select.appendChild(optionElement);
+    var optionElement = document.createElement("option");
+    optionElement.value = row.value;
+    optionElement.innerHTML = row.label;
+    optionElement.classList.add("text-white");
+    language_select.appendChild(optionElement);
   });
-  language_select.selectedIndex = global["language"]
+  language_select.selectedIndex = global["language"];
 
-  language_select.addEventListener('change', (event) => {
-      global["language"] = event.target.selectedIndex
-      global["selected_category"] = 0
-      global["selected_personality"] = 0   
-      
-      chrome.storage.sync.set({"global": global});
-      build_persons_list();
-      populateVoicesList();
-      console.log(event.target.value);
-    });
+  language_select.addEventListener("change", (event) => {
+    global["language"] = event.target.selectedIndex;
+    global["selected_category"] = 0;
+    global["selected_personality"] = 0;
+
+    chrome.storage.sync.set({ global: global });
+    build_persons_list();
+    populateVoicesList();
+    console.log(event.target.value);
+  });
 
   // Build category div
-  category_select_div =  document.createElement("div");
+  category_select_div = document.createElement("div");
   category_select_div.classList.add("input-select-div");
 
   category_select_label = document.createElement("label");
   category_select_label.classList.add("input-select-label");
-  category_select_label.textContent="Category";
-
+  category_select_label.textContent = "Category";
 
   category_select = document.createElement("select");
-  category_select.id = "category-select"
-  category_select.classList.add("input-selects")
-  category_select.addEventListener("change",()=>{
-    global["selected_category"]=this.selectedIndex;
-    chrome.storage.sync.set({"global": global});   
-    
-
+  category_select.id = "category-select";
+  category_select.classList.add("input-selects");
+  category_select.addEventListener("change", () => {
+    global["selected_category"] = this.selectedIndex;
+    chrome.storage.sync.set({ global: global });
   });
-  category_select.selectedIndex = global["selected_category"]
-  category_select_div.appendChild(category_select_label)
-  category_select_div.appendChild(category_select)
+  category_select.selectedIndex = global["selected_category"];
+  category_select_div.appendChild(category_select_label);
+  category_select_div.appendChild(category_select);
 
-    
   // Build personality div
-  personality_select_div =  document.createElement("div");
+  personality_select_div = document.createElement("div");
   personality_select_div.classList.add("input-select-div");
 
   personality_select_label = document.createElement("label");
   personality_select_label.classList.add("input-select-label");
-  personality_select_label.textContent="Personality";
-
-
+  personality_select_label.textContent = "Personality";
 
   personality_select = document.createElement("select");
-  personality_select.id = "personality-select"
-  personality_select.classList.add("input-selects")
-  personality_select.addEventListener("change",()=>{
-    global["selected_personality"]=this.selectedIndex;
-    chrome.storage.sync.set({"global": global});
+  personality_select.id = "personality-select";
+  personality_select.classList.add("input-selects");
+  personality_select.addEventListener("change", () => {
+    global["selected_personality"] = this.selectedIndex;
+    chrome.storage.sync.set({ global: global });
   });
-  personality_select.selectedIndex = global["selected_personality"]
+  personality_select.selectedIndex = global["selected_personality"];
 
+  personality_select_div.appendChild(personality_select_label);
+  personality_select_div.appendChild(personality_select);
 
-  personality_select_div.appendChild(personality_select_label)
-  personality_select_div.appendChild(personality_select)
-  
   build_persons_list();
 
-
   voice_select_label = document.createElement("label");
-  voice_select_label.textContent="Voice";
+  voice_select_label.textContent = "Voice";
   voice_select_label.classList.add("input-select-label");
 
   voice_select = document.createElement("select");
-  voice_select.classList.add("input-selects")
+  voice_select.classList.add("input-selects");
 
-
-
-  voices = []
+  voices = [];
   function populateVoicesList() {
-    console.log("Populating the list of voices")
+    console.log("Populating the list of voices");
     voices = synth.getVoices();
-    console.log(`language : ${lang_options[global["language"]].value}`)
-    for (let i = 0; i < voices.length ; i++) {
-      if(voices[i].lang.startsWith(lang_options[global["language"]].value.substring(0,2)))
-      {
-        const option = document.createElement('option');
+    console.log(`language : ${lang_options[global["language"]].value}`);
+    for (let i = 0; i < voices.length; i++) {
+      if (
+        voices[i].lang.startsWith(
+          lang_options[global["language"]].value.substring(0, 2)
+        )
+      ) {
+        const option = document.createElement("option");
         option.textContent = `${voices[i].name} (${voices[i].lang})`;
-    
+
         if (voices[i].default) {
-          option.textContent += ' — DEFAULT';
+          option.textContent += " — DEFAULT";
         }
-    
-        option.setAttribute('data-lang', voices[i].lang);
-        option.setAttribute('data-name', voices[i].name);
-        voice_select.appendChild(option);  
+
+        option.setAttribute("data-lang", voices[i].lang);
+        option.setAttribute("data-name", voices[i].name);
+        voice_select.appendChild(option);
       }
-    } 
-    voice_select.addEventListener("change", function() {
+    }
+    voice_select.addEventListener("change", function () {
       // Code to execute when the voice_selected option changes
       console.log(this.value);
-      global["voice"]=this.value;
-      chrome.storage.sync.set({"global": global});
+      global["voice"] = this.value;
+      chrome.storage.sync.set({ global: global });
     });
-    if(global["voice"]!="")
-    {
+    if (global["voice"] != "") {
       voice_select.value = global["voice"];
     }
-
   }
-  setTimeout(populateVoicesList,1000);
+  setTimeout(populateVoicesList, 1000);
 
-  voice_select_div =  document.createElement("div");
+  voice_select_div = document.createElement("div");
   voice_select_div.classList.add("input-select-div");
 
-  voice_select_div.appendChild(voice_select_label)
-  voice_select_div.appendChild(voice_select)
-
+  voice_select_div.appendChild(voice_select_label);
+  voice_select_div.appendChild(voice_select);
 
   // textarea.addEventListener("keydown", onSautoread
 
-  autoread_div =  document.createElement("div");
+  autoread_div = document.createElement("div");
   autoread_div.classList.add("input-select-div");
-  
+
   autoread_label = document.createElement("label");
   autoread_label.classList.add("input-select-label");
-  autoread_label.textContent="Autoread";
-  
+  autoread_label.textContent = "Autoread";
+
   autoread = document.createElement("input");
   autoread.classList.add("input-checkbox");
-  autoread.type="checkbox"
+  autoread.type = "checkbox";
 
-  
-  autoread.addEventListener("click", function() {
-      console.log(this.checked);
-      global["auto_audio"]=this.checked;
-      chrome.storage.sync.set({"global": global});
+  autoread.addEventListener("click", function () {
+    console.log(this.checked);
+    global["auto_audio"] = this.checked;
+    chrome.storage.sync.set({ global: global });
   });
-  autoread.checked = global["auto_audio"]
-  autoread_div.appendChild(autoread_label)
-  autoread_div.appendChild(autoread)
-
+  autoread.checked = global["auto_audio"];
+  autoread_div.appendChild(autoread_label);
+  autoread_div.appendChild(autoread);
 
   // Show at startup
-  show_at_startup_div =  document.createElement("div");
+  show_at_startup_div = document.createElement("div");
   show_at_startup_div.classList.add("input-select-div");
-  
+
   show_at_startup_label = document.createElement("label");
   show_at_startup_label.classList.add("input-select-label");
-  show_at_startup_label.textContent="Show at startup?";
-  
+  show_at_startup_label.textContent = "Show at startup?";
+
   show_at_startup = document.createElement("input");
   show_at_startup.classList.add("input-checkbox");
-  show_at_startup.type="checkbox"
+  show_at_startup.type = "checkbox";
 
-  
-  show_at_startup.addEventListener("click", function() {
-      console.log(this.checked);
-      global["show_help_at_startup"]=this.checked;
-      chrome.storage.sync.set({"global": global});
+  show_at_startup.addEventListener("click", function () {
+    console.log(this.checked);
+    global["show_help_at_startup"] = this.checked;
+    chrome.storage.sync.set({ global: global });
   });
-  show_at_startup.checked = global["show_help_at_startup"]
-  show_at_startup_div.appendChild(show_at_startup_label)
-  show_at_startup_div.appendChild(show_at_startup)
-
+  show_at_startup.checked = global["show_help_at_startup"];
+  show_at_startup_div.appendChild(show_at_startup_label);
+  show_at_startup_div.appendChild(show_at_startup);
 
   var credits = document.createElement("div");
   credits.innerHTML = `<footer style="text-align:center;width:100%;">
@@ -659,191 +665,191 @@ function build_ui(){
   optionsDiv.appendChild(category_select_div);
   optionsDiv.appendChild(personality_select_div);
   optionsDiv.appendChild(voice_select_div);
-  
+
   optionsDiv.appendChild(autoread_div);
   optionsDiv.appendChild(show_at_startup_div);
   optionsDiv.appendChild(submit_personality);
 
-  // Append the new div to the floating div    
+  // Append the new div to the floating div
   optionsDiv.appendChild(credits);
 
-  console.log("Done updating ui")
+  console.log("Done updating ui");
 
-  if(!global["show_help_at_startup"]){
-    floatingDiv.style.display="none";
+  if (!global["show_help_at_startup"]) {
+    floatingDiv.style.display = "none";
   }
   add_audio_in_ui();
 }
 // Audio code
 function splitString(string, maxLength) {
-    const sentences = string.match(/[^.!?]+[.!?]/g);
-    const strings = [];
-    let currentString = '';
-  
-    if (sentences) {
-      for (const sentence of sentences) {
-        if (currentString.length + sentence.length > maxLength) {
-          strings.push(currentString);
-          currentString = '';
-        }
-  
-        currentString += `${sentence} `;
+  const sentences = string.match(/[^.!?]+[.!?]/g);
+  const strings = [];
+  let currentString = "";
+
+  if (sentences) {
+    for (const sentence of sentences) {
+      if (currentString.length + sentence.length > maxLength) {
+        strings.push(currentString);
+        currentString = "";
       }
-    } else {
-      strings.push(string);
+
+      currentString += `${sentence} `;
     }
-  
-    if (currentString) {
-      strings.push(currentString);
-    }
-  
-    return strings;
-  }
-  function addListeners(button, utterThis){
-    console.log("Adding listeners")
-    utterThis.onstart = (event) => {
-      isSpeaking=true;
-      button.style.backgroundColor = "red";
-      button.style.boxShadow = "2px 2px 0.5px #808080";
-    };
-    
-    utterThis.onend = (event) => {
-      isSpeaking=false;
-      button.style.backgroundColor = "";
-      button.style.boxShadow = "";
-    };
+  } else {
+    strings.push(string);
   }
 
-function attachAudio_modules(div)
-{
-    console.log("Adding audio tag")
-    if (div.parentNode.getElementsByClassName("audio-out-button").length>0){
-      return;
-    }
-    const audio_out_button = document.createElement("button");
-    audio_out_button.id = "audio-out-button"
-    audio_out_button.classList.add("audio_btn");
-    audio_out_button.innerHTML = "🕪";
-    div.classList.add("flex-1");
-    audio_out_button.classList.add("audio-out-button");
-    div.parentNode.appendChild(audio_out_button);
-    
-    function play_audio(){
-      if(isSpeaking)
-      {
-        console.log("stopping audio");
+  if (currentString) {
+    strings.push(currentString);
+  }
 
-        audio_out_button.style.backgroundColor = "";
-        audio_out_button.style.boxShadow = "";
-        synth.cancel()
-        isSpeaking= false;
-      }
-      else{
-        console.log("starting audio");
-        isSpeaking=true;
-        text=audio_out_button.previousSibling.textContent;
-        console.log(text)
-    
-    
-        const selectedOption = voice_select.selectedOptions[0].getAttribute('data-name');
-        var selectedVoice = null;
-        console.log(`Found selected voice : ${selectedOption}`);
-        for (let i = 0; i < voices.length ; i++) {
-          if (voices[i].name === selectedOption) {
-            selectedVoice = voices[i];
-            console.log("Found selected voice");
-          }
-        }
-        console.log(selectedVoice.voiceURI)
-        if (selectedVoice && selectedVoice.voiceURI === 'native'){
-          console.log("native");
-          const utterThis = new SpeechSynthesisUtterance(text);
-          utterThis.voice = selectedVoice
-          addListeners(audio_out_button, utterThis)
-          synth.speak(utterThis); 
-        }
-        else{
-          console.log("Not native");
-          texts = splitString(text, 200);
-          texts.forEach((text)=>{
-            const utterThis = new SpeechSynthesisUtterance(text);
-            utterThis.voice = selectedVoice
-            addListeners(audio_out_button, utterThis)
-            synth.speak(utterThis);   
-          })
-        }
-      }
-    }
-    audio_out_button.addEventListener("click", () => {
-      play_audio();
-    });
-    if(global["auto_audio"]){
-      play_audio();
-    }
+  return strings;
+}
+function addListeners(button, utterThis) {
+  console.log("Adding listeners");
+  utterThis.onstart = (event) => {
+    isSpeaking = true;
+    button.style.backgroundColor = "red";
+    button.style.boxShadow = "2px 2px 0.5px #808080";
+  };
+
+  utterThis.onend = (event) => {
+    isSpeaking = false;
+    button.style.backgroundColor = "";
+    button.style.boxShadow = "";
+  };
 }
 
+function attachAudio_modules(div) {
+  console.log("Adding audio tag");
+  if (div.parentNode.getElementsByClassName("audio-out-button").length > 0) {
+    return;
+  }
+  const audio_out_button = document.createElement("button");
+  audio_out_button.id = "audio-out-button";
+  audio_out_button.classList.add("audio_btn");
+  audio_out_button.innerHTML = "🕪";
+  div.classList.add("flex-1");
+  audio_out_button.classList.add("audio-out-button");
+  div.parentNode.appendChild(audio_out_button);
+
+  function play_audio() {
+    if (isSpeaking) {
+      console.log("stopping audio");
+
+      audio_out_button.style.backgroundColor = "";
+      audio_out_button.style.boxShadow = "";
+      synth.cancel();
+      isSpeaking = false;
+    } else {
+      console.log("starting audio");
+      isSpeaking = true;
+      text = audio_out_button.previousSibling.textContent;
+      console.log(text);
+
+      const selectedOption =
+        voice_select.selectedOptions[0].getAttribute("data-name");
+      var selectedVoice = null;
+      console.log(`Found selected voice : ${selectedOption}`);
+      for (let i = 0; i < voices.length; i++) {
+        if (voices[i].name === selectedOption) {
+          selectedVoice = voices[i];
+          console.log("Found selected voice");
+        }
+      }
+      console.log(selectedVoice.voiceURI);
+      if (selectedVoice && selectedVoice.voiceURI === "native") {
+        console.log("native");
+        const utterThis = new SpeechSynthesisUtterance(text);
+        utterThis.voice = selectedVoice;
+        addListeners(audio_out_button, utterThis);
+        synth.speak(utterThis);
+      } else {
+        console.log("Not native");
+        texts = splitString(text, 200);
+        texts.forEach((text) => {
+          const utterThis = new SpeechSynthesisUtterance(text);
+          utterThis.voice = selectedVoice;
+          addListeners(audio_out_button, utterThis);
+          synth.speak(utterThis);
+        });
+      }
+    }
+  }
+  audio_out_button.addEventListener("click", () => {
+    play_audio();
+  });
+  if (global["auto_audio"]) {
+    play_audio();
+  }
+}
 
 console.log("Running Chat GPT personality selector code");
-function callback (mutationsList, observer) {    
+function callback(mutationsList, observer) {
   if (observer.isRunning || !mutationsList.length) {
     return;
   }
   add_audio_in_ui();
   observer.isRunning = true;
   var lastDivWithText = get_lastdiv_with_text();
-  try{
-    if(lastDivWithText)
-    {
-      if (lastDivWithText.parentNode.parentNode.parentNode.querySelectorAll("button").length>0){
-        parent = lastDivWithText.parentNode.parentNode.parentNode.querySelectorAll("button")[0].parentNode;
-        if(parent.classList.contains("visible"))
-        {
-          if (lastDivWithText.parentNode.getElementsByClassName("audio-out-button").length==0) {
+  try {
+    if (lastDivWithText) {
+      if (
+        lastDivWithText.parentNode.parentNode.parentNode.querySelectorAll(
+          "button"
+        ).length > 0
+      ) {
+        parent =
+          lastDivWithText.parentNode.parentNode.parentNode.querySelectorAll(
+            "button"
+          )[0].parentNode;
+        if (parent.classList.contains("visible")) {
+          if (
+            lastDivWithText.parentNode.getElementsByClassName(
+              "audio-out-button"
+            ).length == 0
+          ) {
             attachAudio_modules(lastDivWithText);
-          }   
+          }
         }
       }
     }
     var link = document.querySelector("a[href='https://discord.gg/openai']");
-    if(link.parentNode.querySelector("#settings-btn")=== null){
-      const settings_button = document.createElement("button")
+    if (link.parentNode.querySelector("#settings-btn") === null) {
+      const settings_button = document.createElement("button");
       settings_button.classList.add("personality-settings");
-      settings_button.id ="settings-btn";
+      settings_button.id = "settings-btn";
 
-      settings_button.innerHTML=`🪛 Personality settings`;
+      settings_button.innerHTML = `🪛 Personality settings`;
       //settings_button.classList.add("flex py-3 px-3 items-center gap-3 rounded-md hover:bg-gray-500/10 transition-colors duration-200 text-white cursor-pointer text-sm")
-      settings_button.addEventListener('click',()=>{
-        floatingDiv.style.display="block";
-      })
-     
+      settings_button.addEventListener("click", () => {
+        floatingDiv.style.display = "block";
+      });
+
       link.parentNode.insertBefore(settings_button, link.nextSibling);
     }
-
-
-  }
-  catch{
-  }
-  requestAnimationFrame(()=> {
+  } catch {}
+  requestAnimationFrame(() => {
     observer.isRunning = false;
   });
+}
 
-};
+window.addEventListener("load", (event) => {
+  var main = document.querySelector("main");
 
-window.addEventListener('load', (event) => {
-    var main = document.querySelector("main");
-    
-    chrome.storage.sync.get(["global"], (data) => {
-      global =  data.global ;
-    });
+  chrome.storage.sync.get(["global"], (data) => {
+    global = data.global;
+  });
 
-    setTimeout(build_ui,1000);
-    console.log("Chatgpt Personality selector module");
-   
-    observer = new MutationObserver(callback);
-    observer.isRunning = false;
+  setTimeout(build_ui, 1000);
+  console.log("Chatgpt Personality selector module");
 
-    observer.observe(document.body, {
-        childList: true, characterData: true, subtree: true 
-    });
+  observer = new MutationObserver(callback);
+  observer.isRunning = false;
+
+  observer.observe(document.body, {
+    childList: true,
+    characterData: true,
+    subtree: true,
+  });
 });
-
