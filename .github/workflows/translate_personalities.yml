@@ -4,7 +4,9 @@ on:
   push:
     branches:
       - main
-
+    paths:
+      - prompts_en-US.csv
+      
 jobs:
   process-csv:
     runs-on: ubuntu-latest
@@ -20,7 +22,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install pandas torch transformers sentencepiece
+        pip install pandas torch transformers sentencepiece protobuf
 
     - name: Run script
       run: |
