@@ -20,7 +20,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install pandas torch transformers sentencepiece protobuf
+        pip install pandas torch transformers sentencepiece protobuf==3.20
 
     - name: Run script
       run: |
