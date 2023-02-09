@@ -1,0 +1,29 @@
+name: Translate CSV
+
+jobs:
+  process-csv:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        pip install pandas transformers
+
+    - name: Run script
+      run: |
+        python extra/translator.py
+
+    - name: Commit changes
+      uses: endgameinc/github-action-auto-commit-changes@v2
+      with:
+        message: "Processed CSV file"
+        branch: main
+        files: prompts_fr-FR_out.csv
