@@ -1,6 +1,9 @@
 name: Translate CSV
 on:
-  create
+  pull_request:
+  push:
+    branches:
+      - main
 
 jobs:
   process-csv:
