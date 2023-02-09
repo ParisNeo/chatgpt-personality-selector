@@ -1,4 +1,6 @@
 name: Translate CSV
+on:
+  create
 
 jobs:
   process-csv:
