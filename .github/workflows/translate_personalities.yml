@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - prompts_en-US.csv
       
 jobs:
   process-csv:
