@@ -31,8 +31,8 @@
     "web_accessible_resources": [
         {
           "resources": [
-            "prompts_en-US.csv",
-            "prompts_fr-FR.csv"
+            "languages/English_en-US.csv",
+            "languages/Français_fr-FR.csv"
           ],
           "matches": [
             "https://chat.openai.com/*"

@@ -1,0 +1,34 @@
+name: Update Manifest
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update_manifest:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: List files in languages folder
+      run: |
+        cd languages
+        files=$(ls -1)
+
+    - name: Update manifest
+      run: |
+        manifest=$(cat manifest.json)
+        manifest=$(echo "$manifest" | jq '.web_accessible_resources[].resources = []')
+        for file in $files; do
+          manifest=$(echo "$manifest" | jq '.web_accessible_resources[].resources += ["languages/'$file'"]')
+        done
+        echo "$manifest" > manifest.json
+
+    - name: Commit changes
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Update manifest
+        push: true

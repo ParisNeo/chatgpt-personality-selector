@@ -11,14 +11,14 @@ print(df)
 # translator = MBartTranslator()
 df_fr = df.copy()
 
-# print("Translating")
-# for column in tqdm(df_fr.columns):
-#     mask = df_fr[column].notna()
-#     for index in tqdm(df_fr[column][mask].index):
-#         text = df_fr[column].iloc[index]
-#         translated_text = translator.translate(text, "en_XX", "fr_XX")
-#         df_fr[column].iloc[index] = translated_text
-#         tqdm.write(f"Translating '{text}' to '{translated_text}'")
+print("Translating")
+for column in tqdm(df_fr.columns):
+    mask = df_fr[column].notna()
+    for index in tqdm(df_fr[column][mask].index):
+        text = df_fr[column].iloc[index]
+        translated_text = translator.translate(text, "en_XX", "fr_XX")
+        df_fr[column].iloc[index] = translated_text
+        tqdm.write(f"Translating '{text}' to '{translated_text}'")
 
 
 folder = Path(__file__).parent
