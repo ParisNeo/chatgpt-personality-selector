@@ -13,11 +13,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: List files in languages folder
-      run: |
-        cd languages
-        files=$(ls -1)
-
     - name: Update manifest
       env:
         FILES: ${{ env.FILES }}
