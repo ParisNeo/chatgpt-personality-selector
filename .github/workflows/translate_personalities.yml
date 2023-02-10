@@ -25,15 +25,3 @@ jobs:
     - name: Run script
       run: |
         python extra/translator.py
-
-    - name: Commit changes
-      uses: actions/github-script@v2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        script: |
-          git config --global user.email "action@github.com"
-          git config --global user.name "GitHub Action"
-          git add prompts_fr-FR_out.csv
-          git commit -m "Processed CSV file"
-          git push origin main
