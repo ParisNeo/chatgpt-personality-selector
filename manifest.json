@@ -36,6 +36,8 @@
     {
       "resources": [
         "languages/prompt_en-US.csv",
+        "languages/prompt_fr-FR.csv",
+        "languages/prompt_en-US.csv",
         "languages/prompt_fr-FR.csv"
       ],
       "matches": [
