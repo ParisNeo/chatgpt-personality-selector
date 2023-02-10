@@ -17,7 +17,7 @@ jobs:
       run: |
         cd languages
         files=$(ls -1)
-        echo found files : $files
+        echo "found files : $files"
 
     - name: Update manifest
       run: |
@@ -26,6 +26,7 @@ jobs:
         for file in $files; do
           manifest=$(echo "$manifest" | jq '.web_accessible_resources[].resources += ["languages/'$file'"]')
         done
+        echo "$manifest"
         echo "$manifest" > manifest.json
 
     - name: Commit changes
