@@ -335,9 +335,15 @@ function build_option(option_name, select_options_list) {
 function build_persons_list() {
   // Read the CSV file
   var fileUrl;
-  console.log(`Loading languages/${lang_options[global.language].label}_${lang_options[global.language].value}.csv`);
+  console.log(
+    `Loading languages/${lang_options[global.language].label}_${
+      lang_options[global.language].value
+    }.csv`
+  );
   fileUrl = chrome.runtime.getURL(
-    `languages/${lang_options[global.language].label}_${lang_options[global.language].value}.csv`
+    `languages/${lang_options[global.language].label}_${
+      lang_options[global.language].value
+    }.csv`
   );
   category_select.innerHTML = "";
   personality_select.innerHTML = "";
