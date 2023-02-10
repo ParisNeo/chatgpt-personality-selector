@@ -7,8 +7,8 @@ from pathlib import Path
 df = pd.read_csv("prompts_en-US.csv", quotechar='"')
 
 print(df)
-# print("Loading model")
-# translator = MBartTranslator()
+print("Loading model")
+translator = MBartTranslator()
 df_fr = df.copy()
 
 print("Translating")
@@ -21,7 +21,7 @@ for column in tqdm(df_fr.columns):
         tqdm.write(f"Translating '{text}' to '{translated_text}'")
 
 
-folder = Path(__file__).parent
-output_file= folder/"prompts_fr-FR_out.csv"
+folder = Path(__file__).parent.parent/"languages"
+output_file= folder/"prompts_fr-FR.csv"
 print(f"Exporting the data to {output_file}")
 df_fr.to_csv(output_file, quotechar='"',index=False)
