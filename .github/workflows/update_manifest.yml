@@ -17,17 +17,16 @@ jobs:
       run: |
         cd languages
         files=$(ls -1)
-        echo "found files : \n$files"
+        echo "::set-env name=FILES::$files"
 
     - name: Update manifest
       run: |
-        echo "found files : \n$files"
+        files=$(echo "$FILES")
         manifest=$(cat manifest.json)
-        manifest=$(echo "$manifest" | jq '.web_accessible_resources[].resources = []')
+        manifest=$(echo "$manifest" | jq 'if .web_accessible_resources == [] then .web_accessible_resources = [{"resources":[],"matches":["https://chat.openai.com/*"]}] else . end')
         for file in $files; do
           manifest=$(echo "$manifest" | jq '.web_accessible_resources[].resources += ["languages/'$file'"]')
         done
-        echo "$manifest"
         echo "$manifest" > manifest.json
 
     - name: Commit changes
