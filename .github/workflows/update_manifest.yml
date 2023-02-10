@@ -17,11 +17,13 @@ jobs:
       run: |
         cd languages
         files=$(ls -1)
-        echo "::set-env name=FILES::$files"
+        echo "FILES=$files" > $GITHUB_ENV
 
     - name: Update manifest
+      env:
+        FILES: ${{ env.FILES }}
       run: |
-        files=$(echo "$FILES")
+        files=$FILES
         manifest=$(cat manifest.json)
         manifest=$(echo "$manifest" | jq 'if .web_accessible_resources == [] then .web_accessible_resources = [{"resources":[],"matches":["https://chat.openai.com/*"]}] else . end')
         for file in $files; do
