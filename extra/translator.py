@@ -20,6 +20,8 @@ df_fr = df.copy()
 #         df_fr[column].iloc[index] = translated_text
 #         tqdm.write(f"Translating '{text}' to '{translated_text}'")
 
+
 folder = Path(__file__).parent
-print(f"Exporting the data to {folder}")
-df_fr.to_csv(folder/"prompts_fr-FR_out.csv", quotechar='"',index=False)
+output_file= folder/"prompts_fr-FR_out.csv"
+print(f"Exporting the data to {output_file}")
+df_fr.to_csv(output_file, quotechar='"',index=False)
