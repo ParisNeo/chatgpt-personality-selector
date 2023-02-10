@@ -17,6 +17,7 @@ jobs:
       run: |
         cd languages
         files=$(ls -1)
+        echo found files : $files
 
     - name: Update manifest
       run: |
