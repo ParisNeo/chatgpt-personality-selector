@@ -17,10 +17,11 @@ jobs:
       run: |
         cd languages
         files=$(ls -1)
-        echo "found files : $files"
+        echo "found files : \n$files"
 
     - name: Update manifest
       run: |
+        echo "found files : \n$files"
         manifest=$(cat manifest.json)
         manifest=$(echo "$manifest" | jq '.web_accessible_resources[].resources = []')
         for file in $files; do
