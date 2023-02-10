@@ -23,6 +23,7 @@ jobs:
         pip install pandas torch transformers sentencepiece protobuf==3.20
 
     - name: Run script
+    - uses: actions/checkout@v2
       run: |
         python extra/translator.py
 
