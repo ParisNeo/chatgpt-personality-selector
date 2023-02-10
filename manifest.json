@@ -36,7 +36,9 @@
     {
       "resources": [
         "languages/English_en-US.csv",
-        "languages/Français_fr-FR.csv"
+        "languages/Français_fr-FR.csv",
+        "languages/prompt_en-US.csv",
+        "languages/prompt_fr-FR.csv"
       ],
       "matches": [
         "https://chat.openai.com/*"
