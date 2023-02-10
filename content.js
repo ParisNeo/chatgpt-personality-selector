@@ -336,12 +336,12 @@ function build_persons_list() {
   // Read the CSV file
   var fileUrl;
   console.log(
-    `Loading languages/${lang_options[global.language].label}_${
+    `Loading languages/prompt_${
       lang_options[global.language].value
     }.csv`
   );
   fileUrl = chrome.runtime.getURL(
-    `languages/${lang_options[global.language].label}_${
+    `languages/prompt_${
       lang_options[global.language].value
     }.csv`
   );
