@@ -1,42 +1,43 @@
 {
-    "manifest_version": 3,
-    "name": "ChatGPT-Personality-Selector",
-    "description": "This extention allows the user to condition chatgpt for specific applications rsulting in a more optimized use of the tool.",
-    "version": "1.4",
-    "icons": {
-        "16": "icon.png",
-        "32": "icon.png",
-        "48": "icon.png",
-        "128": "icon.png"
-      },
-    "host_permissions": [
-        "https://ddg-webapp-aagd.vercel.app/*"
-    ],
-    "background": {
-        "service_worker": "background.js"
-    },      
-    "content_scripts": [
+  "manifest_version": 3,
+  "name": "ChatGPT-Personality-Selector",
+  "description": "This extention allows the user to condition chatgpt for specific applications rsulting in a more optimized use of the tool.",
+  "version": "1.4",
+  "icons": {
+    "16": "icon.png",
+    "32": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "host_permissions": [
+    "https://ddg-webapp-aagd.vercel.app/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
     {
-        "matches": [
-            "https://chat.openai.com/*"
-        ],
-        "css": ["style.css"],
-        "js": ["papaparse.min.js","content.js"]
+      "matches": [
+        "https://chat.openai.com/*"
+      ],
+      "css": [
+        "style.css"
+      ],
+      "js": [
+        "papaparse.min.js",
+        "content.js"
+      ]
     }
-    ],
-    "permissions": [
-        "storage"
-    ],
-    
-    "web_accessible_resources": [
-        {
-          "resources": [
-            "languages/English_en-US.csv",
-            "languages/Français_fr-FR.csv"
-          ],
-          "matches": [
-            "https://chat.openai.com/*"
-          ]
-        }
-      ]    
+  ],
+  "permissions": [
+    "storage"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [],
+      "matches": [
+        "https://chat.openai.com/*"
+      ]
+    }
+  ]
 }
