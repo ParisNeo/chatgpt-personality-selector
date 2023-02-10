@@ -4,7 +4,7 @@ from tqdm import tqdm
 from pathlib import Path
 
 # Load text
-df = pd.read_csv("prompts_en-US.csv", quotechar='"')
+df = pd.read_csv("languages/prompts_en-US.csv", quotechar='"')
 
 print(df)
 print("Loading model")
