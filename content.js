@@ -336,10 +336,10 @@ function build_persons_list() {
   // Read the CSV file
   var fileUrl;
   console.log(
-    `Loading languages/prompt_${lang_options[global.language].value}.csv`
+    `Loading languages/prompts_${lang_options[global.language].value}.csv`
   );
   fileUrl = chrome.runtime.getURL(
-    `languages/prompt_${lang_options[global.language].value}.csv`
+    `languages/prompts_${lang_options[global.language].value}.csv`
   );
   category_select.innerHTML = "";
   personality_select.innerHTML = "";
