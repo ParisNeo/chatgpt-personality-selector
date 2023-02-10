@@ -23,10 +23,8 @@ jobs:
         pip install pandas torch transformers sentencepiece protobuf==3.20
 
     - name: Run script
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 2
-    - run: git checkout HEAD^
-    - run: |
+      run: |
         python extra/translator.py
-
+    
+    - name: Add & Commit
+      uses: EndBug/add-and-commit@v9.1.1
