@@ -1,0 +1,21 @@
+name: Auto Rebase and Squash
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  rebase_and_squash:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Auto Rebase and Squash
+      run: |
+        last_commit_message=$(git log -1 --pretty=%B)
+        if [[ "$last_commit_message" == ^(U|u)pdate* ]]; then
+          git rebase -i HEAD~2
+        fi
