@@ -3,6 +3,9 @@ import pandas as pd
 from tqdm import tqdm
 from pathlib import Path
 
+src = "en_XX"
+dst = "ar_AR"
+
 # Load text
 df = pd.read_csv("languages/prompts_en-US.csv", quotechar='"')
 
@@ -16,7 +19,7 @@ for column in tqdm(df_fr.columns):
     mask = df_fr[column].notna()
     for index in tqdm(df_fr[column][mask].index):
         text = df_fr[column].iloc[index]
-        translated_text = translator.translate(text, "en_XX", "fr_XX")
+        translated_text = translator.translate(text, src, dst)
         df_fr[column].iloc[index] = translated_text
         tqdm.write(f"Translating '{text}' to '{translated_text}'")
 

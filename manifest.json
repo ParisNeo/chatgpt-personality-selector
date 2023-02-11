@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "ChatGPT-Personality-Selector",
   "description": "This extention allows the user to condition chatgpt for specific applications rsulting in a more optimized use of the tool.",
-  "version": "1.4",
+  "version": "1.5",
   "icons": {
     "16": "icon.png",
     "32": "icon.png",
@@ -36,6 +36,7 @@
     {
       "resources": [
         "languages/prompts_en-US.csv",
+        "languages/prompts_fr-FR.csv",
         "languages/prompts_fr-FR_bk.csv"
       ],
       "matches": [
