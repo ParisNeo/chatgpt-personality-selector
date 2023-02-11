@@ -11,6 +11,7 @@ var global = {
 var lang_options = [
   { value: "en-US", label: "English" },
   { value: "fr-FR", label: "Français" },
+  { value: "ar-AR", label: "العربية" },
 ];
 
 var floatingDiv;
