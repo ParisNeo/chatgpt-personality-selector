@@ -22,6 +22,7 @@ jobs:
         cd ..
         manifest=$(cat manifest.json)
         manifest=$(echo "$manifest" | jq 'if .web_accessible_resources == [] then .web_accessible_resources = [{"resources":[],"matches":["https://chat.openai.com/*"]}] else . end')
+        manifest=$(echo "$manifest" | jq '.web_accessible_resources[].resources = []')
         for file in $files; do
           manifest=$(echo "$manifest" | jq '.web_accessible_resources[].resources += ["languages/'$file'"]')
         done
