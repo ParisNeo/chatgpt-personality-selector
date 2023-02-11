@@ -5,6 +5,7 @@ from pathlib import Path
 
 src = "en_XX"
 dst = "ar_AR"
+output = "prompts_ar-AR.csv"
 
 # Load text
 df = pd.read_csv("languages/prompts_en-US.csv", quotechar='"')
@@ -25,6 +26,6 @@ for column in tqdm(df_fr.columns):
 
 
 folder = Path(__file__).parent.parent/"languages"
-output_file= folder/"prompts_fr-FR.csv"
+output_file= folder/output
 print(f"Exporting the data to {output_file}")
 df_fr.to_csv(output_file, quotechar='"',index=False)
