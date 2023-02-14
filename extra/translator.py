@@ -3,6 +3,7 @@ import pandas as pd
 from tqdm import tqdm
 from pathlib import Path
 
+print("----------------- Multi translator V 1.1 -------------------------")
 src = "en_XX"
 dsts = [
     "it_IT",
