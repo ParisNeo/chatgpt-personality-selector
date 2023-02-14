@@ -51,7 +51,7 @@ for column in tqdm(df_fr.columns):
         text = df_fr[column].iloc[index]
         translated_text = translator.translate(text, src, dst)
         df_fr[column].iloc[index] = translated_text
-        tqdm.write(f"Translating '{text}' to '{translated_text}'")
+        # tqdm.write(f"Translating '{text}' to '{translated_text}'")
 
 # Export the translated dataframe to a new CSV file
 folder = Path(__file__).parent.parent/"languages"
