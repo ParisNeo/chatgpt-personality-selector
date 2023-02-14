@@ -1,8 +1,12 @@
 name: Translate CSV
 on:
   workflow_dispatch:
+    inputs:
+      lang:
+        description: 'The target language for translation'
+        required: true
+        default: 'it_IT'
 
-      
 jobs:
   process-csv:
     runs-on: ubuntu-latest
@@ -22,7 +26,7 @@ jobs:
 
     - name: Run script
       run: |
-        python extra/translator.py
-    
+        python extra/translator.py ${{ inputs.lang }}
+
     - name: Add & Commit
       uses: EndBug/add-and-commit@v9.1.1
