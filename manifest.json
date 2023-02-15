@@ -38,6 +38,7 @@
         "languages/prompts_ar-AR.csv",
         "languages/prompts_en-US.csv",
         "languages/prompts_fr-FR.csv",
+        "languages/prompts_it-IT.csv",
         "languages/prompts_fr-FR_bk.csv"
       ],
       "matches": [
