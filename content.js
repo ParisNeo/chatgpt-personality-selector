@@ -251,58 +251,28 @@ function onSubmit(event) {
     isProcessing = true;
 
     try {
-      if (personality.prompt == "<Search,EN>") {
-        let query = textarea.value;
-        if (query === "") {
-          alert(
-            "To use this personality, first write the query you want to search on the internet in the query textarea then press the Apply personality button.\nAdd &max_results=<the number of results you seek> to set the maximum number of results expoected.\nExample: &max_results=10 to set it to 10"
-          );
-        }
-        textarea.value = "";
+      let query = textarea.value;
+      if (query === "") {
+        alert(
+          "To use this personality, first write the query you want to search on the internet in the query textarea then press the Apply personality button.\nAdd &max_results=<the number of results you seek> to set the maximum number of results expoected.\nExample: &max_results=10 to set it to 10"
+        );
+      }
+      textarea.value = "";
 
-        query = query.trim();
+      query = query.trim();
 
-        if (query === "") {
-          isProcessing = false;
-          return;
-        }
+      if (query === "") {
+        isProcessing = false;
+        return;
+      }
 
-        api_search(query).then((results) => {
-          conditionChatGPTEN(results, query);
-          pressEnter();
-          isProcessing = false;
-        });
-      } else if (personality.prompt == "<Search,FR>") {
-        let query = textarea.value;
-        if (query === "") {
-          alert(
-            "Pour utiliser cette personnalité, écrivez d'abord la requête que vous souhaitez rechercher sur Internet dans la zone de texte de la requête, puis appuyez sur le bouton Apply personality.\nAjoutez &max_results=<le nombre de résultats que vous recherchez> pour définir le nombre maximum de résultats attendus.\nExemple : &max_results=10 pour le définir sur 10"
-          );
-        }
-        textarea.value = "";
-
-        query = query.trim();
-
-        if (query === "") {
-          isProcessing = false;
-          return;
-        }
-
-        api_search(query).then((results) => {
-          conditionChatGPTFR(results, query);
-          pressEnter();
-          isProcessing = false;
-        });
-      } else {
-        console.log("Setting text data");
-        if (personality.disclaimer !== "") {
-          alert(personality.disclaimer);
-        }
-        textarea.value = personality.prompt;
-        console.log("Pressig enter");
+      api_search(query).then((results) => {
+        conditionChatGPTEN(results, query);
         pressEnter();
         isProcessing = false;
-      }
+      });
+
+
     } catch (error) {
       isProcessing = false;
       showErrorMessage(error);

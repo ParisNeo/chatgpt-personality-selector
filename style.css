@@ -127,6 +127,7 @@ button:hover{
     position: absolute;
     bottom: 0;
     padding: 10px;
+    color: #fff;
 
 }
 .title-bar {
@@ -149,6 +150,7 @@ button:hover{
     width:30%;
     padding-left: 10px;
     left: 10px;
+    color: #fff;
 }
 .input-selects{
     position: absolute;
