@@ -271,8 +271,6 @@ function onSubmit(event) {
         pressEnter();
         isProcessing = false;
       });
-
-
     } catch (error) {
       isProcessing = false;
       showErrorMessage(error);
