@@ -36,10 +36,11 @@
     {
       "resources": [
         "languages/prompts_ar-AR.csv",
+        "languages/prompts_de-DE.csv",
         "languages/prompts_en-US.csv",
         "languages/prompts_fr-FR.csv",
-        "languages/prompts_it-IT.csv",
-        "languages/prompts_fr-FR_bk.csv"
+        "languages/prompts_fr-FR_bk.csv",
+        "languages/prompts_it-IT.csv"
       ],
       "matches": [
         "https://chat.openai.com/*"
