@@ -183,36 +183,6 @@ function conditionChatGPT(results, query, lang) {
   textarea.value = formattedResults;
 }
 
-function conditionChatGPTFR(results, query) {
-  let counter = 1;
-  let formattedResults = `Date actuelle: ${new Date().toLocaleDateString()}\n\Sujet :  ${query}.\n\n`;
-
-  formattedResults =
-    formattedResults +
-    `Instructions:
-  Agir en tant qu'IA spécialisée dans l'analyse des résultats de recherche sur le Web.
-  L'IA sait comment écrire différents formats de texte tels que latex, démarquage et autres.
-  En plus de l'interaction naturelle, l'IA peut répondre à ces personality_select :
-  sentiment, résumer, mksurvey, afficher les perspectives, critiquer, lister, latex, démarquage.
-  Assurez-vous de citer les résultats en utilisant la notation [[number](URL)] après la référence pour que les utilisateurs puissent consulter la page.
-  Soyez précis et utilisez un anglais académique.
-  Respectez les demandes des utilisateurs.
-  L'utilisateur peut formuler des requêtes concernant les résultats de la recherche. répondre de manière formelle.\n\n
-  Après avoir récupéré les données de recherche Web, répondez simplement avec un message de bienvenue et attendez la commande utilisateur.\n
-  Commencez par afficher le message de bienvenue qui explique ce que vous pouvez faire en détail.`;
-  formattedResults =
-    formattedResults + `Résultats de la recherche d'articles sur le Web :\n\n`;
-  formattedResults =
-    formattedResults +
-    results.reduce(
-      (acc, result) =>
-        (acc += `[${counter++}] "${result.body}"\nSource: ${result.href}\n\n`),
-      ""
-    );
-
-  textarea.value = formattedResults;
-}
-
 function pressEnter() {
   textarea.focus();
   const enterEvent = new KeyboardEvent("keydown", {
