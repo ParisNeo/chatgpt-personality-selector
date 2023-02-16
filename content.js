@@ -154,7 +154,7 @@ function showErrorMessage(e) {
   }, 5000);
 }
 
-function conditionChatGPTEN(results, query) {
+function conditionChatGPT(results, query, lang) {
   let counter = 1;
   let formattedResults = `Current date: ${new Date().toLocaleDateString()}\n\nSubject :  ${query}.\n\n`;
 
@@ -170,8 +170,8 @@ function conditionChatGPTEN(results, query) {
     Stick to the user requests.
     The user can formulate requests concerning the search results. respond in a formal manner.\n\n
     After recovering the web search data, just answer with welcome message and wait for the user command.\n
-    Start by showing the welcome message that explains what you can do in details.`;
-  formattedResults = formattedResults + `Articles web search results:\n\n`;
+    Start by showing the welcome message that explains what you can do in details.\nAll responses should be in ${lang}`;
+  formattedResults = formattedResults + `\nArticles web search results:\n\n`;
   formattedResults =
     formattedResults +
     results.reduce(
@@ -267,7 +267,7 @@ function onSubmit(event) {
       }
 
       api_search(query).then((results) => {
-        conditionChatGPTEN(results, query);
+        conditionChatGPT(results, query, lang_options[global.language].label);
         pressEnter();
         isProcessing = false;
       });
