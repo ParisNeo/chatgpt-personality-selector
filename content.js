@@ -73,7 +73,7 @@ function add_audio_in_ui() {
       }
     }
 
-    console.log(`trying to add audio in button to ${input}`);
+
     if (!found) {
       const audio_in_button = document.createElement("button");
       audio_in_button.id = "audio_in_tool";
@@ -94,11 +94,9 @@ function add_audio_in_ui() {
 
       audio_in_button.addEventListener("click", () => {
         if (isStarted) {
-          console.log("Stopping previous recognition");
           recognition.stop();
           isStarted = false;
         } else {
-          console.log("Starting new recognition");
           recognition.lang = language_select.value;
           recognition.start();
           isStarted = true;
@@ -197,7 +195,6 @@ function pressEnter() {
 // use &max_results= to set the maximum number of results expoected
 async function api_search(query) {
   var url = `https://ddg-webapp-aagd.vercel.app/search?&q=${query}`;
-  console.log(url);
   const response = await fetch(url);
   return await response.json();
 }
@@ -212,38 +209,45 @@ function onSubmit(event) {
   var personality_select = document.getElementById("personality-select");
   personality = JSON.parse(personality_select.value);
   textarea = document.querySelector("textarea");
-  console.log(`On submit triggered with ${JSON.stringify(personality)}`);
   add_audio_in_ui();
   // Save global
   chrome.storage.sync.set({ global: global });
   if (!isProcessing) {
-    console.log("Starting");
     isProcessing = true;
+    if (personality.prompt == "search") {
+      try {
+        let query = textarea.value;
+        if (query === "") {
+          alert(
+            "To use this personality, first write the query you want to search on the internet in the query textarea then press the Apply personality button.\nAdd &max_results=<the number of results you seek> to set the maximum number of results expoected.\nExample: &max_results=10 to set it to 10"
+          );
+        }
+        textarea.value = "";
 
-    try {
-      let query = textarea.value;
-      if (query === "") {
-        alert(
-          "To use this personality, first write the query you want to search on the internet in the query textarea then press the Apply personality button.\nAdd &max_results=<the number of results you seek> to set the maximum number of results expoected.\nExample: &max_results=10 to set it to 10"
-        );
-      }
-      textarea.value = "";
+        query = query.trim();
 
-      query = query.trim();
+        if (query === "") {
+          isProcessing = false;
+          return;
+        }
 
-      if (query === "") {
+        api_search(query).then((results) => {
+          conditionChatGPT(results, query, lang_options[global.language].label);
+          pressEnter();
+          isProcessing = false;
+        });
+      } catch (error) {
         isProcessing = false;
-        return;
+        showErrorMessage(error);
       }
-
-      api_search(query).then((results) => {
-        conditionChatGPT(results, query, lang_options[global.language].label);
-        pressEnter();
-        isProcessing = false;
-      });
-    } catch (error) {
-      isProcessing = false;
-      showErrorMessage(error);
+    }
+    else{
+      if (personality.disclaimer !== "") {
+        alert(personality.disclaimer);
+      }
+      textarea.value = personality.prompt;
+      pressEnter();
+      isProcessing = false;      
     }
   }
   floatingDiv.style.display = "none";
@@ -276,15 +280,11 @@ function build_option(option_name, select_options_list) {
 function build_persons_list() {
   // Read the CSV file
   var fileUrl;
-  console.log(
-    `Loading languages/prompts_${lang_options[global.language].value}.csv`
-  );
   fileUrl = chrome.runtime.getURL(
     `languages/prompts_${lang_options[global.language].value}.csv`
   );
   category_select.innerHTML = "";
   personality_select.innerHTML = "";
-  console.log(fileUrl);
   // Use PapaParse to parse the CSV file
   fetch(fileUrl)
     .then((response) => response.text())
@@ -311,9 +311,7 @@ function build_persons_list() {
           categorySelect.addEventListener("change", function () {
             var selectedCategory = this.value;
             submit_personality = document.getElementById("submit-personality");
-            console.log(`Selected category :${this.selectedIndex}`);
             if (this.selectedIndex == 0) {
-              console.log("changing text to search");
               submit_personality.innerHTML = "🔍 Search";
             } else {
               submit_personality.innerHTML = `🧠 Apply personality`;
@@ -360,7 +358,6 @@ function build_persons_list() {
 }
 
 function build_ui() {
-  console.log("building ui");
   // Create the main div
   floatingDiv = document.createElement("div");
   floatingDiv.classList.add("floating-div");
@@ -393,7 +390,6 @@ function build_ui() {
   var divider = document.createElement("hr");
   floatingDiv.appendChild(divider);
   floatingDiv.appendChild(optionsDiv);
-  console.log("Updating UI");
 
   textarea = document.querySelector("textarea");
 
@@ -434,7 +430,6 @@ function build_ui() {
     chrome.storage.sync.set({ global: global });
     build_persons_list();
     populateVoicesList();
-    console.log(event.target.value);
   });
 
   // Build category div
@@ -487,9 +482,7 @@ function build_ui() {
 
   voices = [];
   function populateVoicesList() {
-    console.log("Populating the list of voices");
     voices = synth.getVoices();
-    console.log(`language : ${lang_options[global["language"]].value}`);
     for (let i = 0; i < voices.length; i++) {
       if (
         voices[i].lang.startsWith(
@@ -510,7 +503,6 @@ function build_ui() {
     }
     voice_select.addEventListener("change", function () {
       // Code to execute when the voice_selected option changes
-      console.log(this.value);
       global["voice"] = this.value;
       chrome.storage.sync.set({ global: global });
     });
@@ -540,7 +532,6 @@ function build_ui() {
   autoread.type = "checkbox";
 
   autoread.addEventListener("click", function () {
-    console.log(this.checked);
     global["auto_audio"] = this.checked;
     chrome.storage.sync.set({ global: global });
   });
@@ -561,7 +552,6 @@ function build_ui() {
   show_at_startup.type = "checkbox";
 
   show_at_startup.addEventListener("click", function () {
-    console.log(this.checked);
     global["show_help_at_startup"] = this.checked;
     chrome.storage.sync.set({ global: global });
   });
@@ -616,8 +606,6 @@ function build_ui() {
   // Append the new div to the floating div
   optionsDiv.appendChild(credits);
 
-  console.log("Done updating ui");
-
   if (!global["show_help_at_startup"]) {
     floatingDiv.style.display = "none";
   }
@@ -649,7 +637,6 @@ function splitString(string, maxLength) {
   return strings;
 }
 function addListeners(button, utterThis) {
-  console.log("Adding listeners");
   utterThis.onstart = (event) => {
     isSpeaking = true;
     button.style.backgroundColor = "red";
@@ -664,7 +651,6 @@ function addListeners(button, utterThis) {
 }
 
 function attachAudio_modules(div) {
-  console.log("Adding audio tag");
   if (div.parentNode.getElementsByClassName("audio-out-button").length > 0) {
     return;
   }
@@ -678,37 +664,29 @@ function attachAudio_modules(div) {
 
   function play_audio() {
     if (isSpeaking) {
-      console.log("stopping audio");
 
       audio_out_button.style.backgroundColor = "";
       audio_out_button.style.boxShadow = "";
       synth.cancel();
       isSpeaking = false;
     } else {
-      console.log("starting audio");
       isSpeaking = true;
       text = audio_out_button.previousSibling.textContent;
-      console.log(text);
 
       const selectedOption =
         voice_select.selectedOptions[0].getAttribute("data-name");
       var selectedVoice = null;
-      console.log(`Found selected voice : ${selectedOption}`);
       for (let i = 0; i < voices.length; i++) {
         if (voices[i].name === selectedOption) {
           selectedVoice = voices[i];
-          console.log("Found selected voice");
         }
       }
-      console.log(selectedVoice.voiceURI);
       if (selectedVoice && selectedVoice.voiceURI === "native") {
-        console.log("native");
         const utterThis = new SpeechSynthesisUtterance(text);
         utterThis.voice = selectedVoice;
         addListeners(audio_out_button, utterThis);
         synth.speak(utterThis);
       } else {
-        console.log("Not native");
         texts = splitString(text, 200);
         texts.forEach((text) => {
           const utterThis = new SpeechSynthesisUtterance(text);
@@ -727,7 +705,6 @@ function attachAudio_modules(div) {
   }
 }
 
-console.log("Running Chat GPT personality selector code");
 function callback(mutationsList, observer) {
   if (observer.isRunning || !mutationsList.length) {
     return;
@@ -757,18 +734,15 @@ function callback(mutationsList, observer) {
         }
       }
     }
-    console.log("Searching for menu entry")
     var links = document.querySelectorAll('a');
     for (var i = 0; i < links.length; i++) {
       // Do something with the link, e.g., add a class to it
-      console.log();
       if (links[i].innerText==="Dark mode")
       {
         link = links[i]
         break;
       }
     }
-    console.log(`Entry found ${link}`)
     if (link.parentNode.querySelector("#settings-btn") === null) {
       const settings_button = document.createElement("button");
       settings_button.classList.add("personality-settings");
@@ -796,7 +770,6 @@ window.addEventListener("load", (event) => {
   });
 
   setTimeout(build_ui, 1000);
-  console.log("Chatgpt Personality selector module");
 
   observer = new MutationObserver(callback);
   observer.isRunning = false;
