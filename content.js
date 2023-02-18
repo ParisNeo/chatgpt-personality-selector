@@ -757,7 +757,18 @@ function callback(mutationsList, observer) {
         }
       }
     }
-    var link = document.querySelector("a[href='https://discord.gg/openai']");
+    console.log("Searching for menu entry")
+    var links = document.querySelectorAll('a');
+    for (var i = 0; i < links.length; i++) {
+      // Do something with the link, e.g., add a class to it
+      console.log();
+      if (links[i].innerText==="Dark mode")
+      {
+        link = links[i]
+        break;
+      }
+    }
+    console.log(`Entry found ${link}`)
     if (link.parentNode.querySelector("#settings-btn") === null) {
       const settings_button = document.createElement("button");
       settings_button.classList.add("personality-settings");
