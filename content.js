@@ -206,7 +206,7 @@ function chatGPTResults(results, query, lang) {
       ""
     );
 
-    formattedResults = formattedResults + `\If you need more information to answer the questions use a response that contains only SEARCHNET: followed by the search query. You will receive more data\n\n`;
+    formattedResults = formattedResults + `\If you need more information to answer the questions. Ask the search engine using the syntax SEARCHNET: followed by the search query. You will receive more data to work with\n\n`;
     textarea.value = formattedResults;
 }
 
