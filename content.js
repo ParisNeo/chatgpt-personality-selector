@@ -181,6 +181,35 @@ function conditionChatGPT(results, query, lang) {
   textarea.value = formattedResults;
 }
 
+
+function chatGPTResults(results, query, lang) {
+  if (results.length === 0) {
+    textarea.value = "No results found";
+    return;
+  }
+
+  let counter = 1;
+  let formattedResults = `Current date: ${new Date().toLocaleDateString()}\n\nSubject :  ${query}.\n\n`;
+  formattedResults =
+    formattedResults +
+    `Instructions:
+    Make sure to cite results using [[number](URL)] notation after the reference to enable the users to click on it and view the source web page.
+    Be precise and use academic english.
+    Stick to the user requests.
+    The user can formulate requests concerning the search results. respond in a formal manner.\n\nAll responses should be in ${lang}`;
+  formattedResults = formattedResults + `\nArticles web search results:\n\n`;
+  formattedResults =
+    formattedResults +
+    results.reduce(
+      (acc, result) =>
+        (acc += `[${counter++}] "${result.body}"\nSource: ${result.href}\n\n`),
+      ""
+    );
+
+  textarea.value = formattedResults;
+}
+
+
 function pressEnter() {
   textarea.focus();
   const enterEvent = new KeyboardEvent("keydown", {
@@ -217,6 +246,10 @@ function onSubmit(event) {
     if (personality.prompt == "search") {
       try {
         let query = textarea.value;
+        if (!query.includes("&max_results=")) {
+          // &max_results= not found in query, so add it
+          query += "&max_results=10";
+        }
         if (query === "") {
           alert(
             "To use this personality, first write the query you want to search on the internet in the query textarea then press the Apply personality button.\nAdd &max_results=<the number of results you seek> to set the maximum number of results expoected.\nExample: &max_results=10 to set it to 10"
@@ -729,7 +762,40 @@ function callback(mutationsList, observer) {
               "audio-out-button"
             ).length == 0
           ) {
+            console.log("Adding audio module")
             attachAudio_modules(lastDivWithText);
+            let text = lastDivWithText.textContent;
+            console.log(text);
+            let searchTerm = "SEARCHNET:";
+            let index = text.indexOf(searchTerm);
+            if (index !== -1) {
+              let substring = text.substring(index + searchTerm.length);
+              console.log(substring);
+              try {
+                let query = substring;
+                if (!query.includes("&max_results=")) {
+                  // &max_results= not found in query, so add it
+                  query += "&max_results=10";
+                }
+                query = query.trim();
+        
+                if (query === "") {
+                  isProcessing = false;
+                  return;
+                }
+                console.log(`Query ${query}`)
+                api_search(query).then((results) => {
+                  chatGPTResults(results, query, lang_options[global.language].label);
+                  pressEnter();
+                  isProcessing = false;
+                });
+              } catch (error) {
+                isProcessing = false;
+                showErrorMessage(error);
+              }
+              // Do something with the extracted substring
+            }
+            
           }
         }
       }
