@@ -206,7 +206,8 @@ function chatGPTResults(results, query, lang) {
       ""
     );
 
-  textarea.value = formattedResults;
+    formattedResults = formattedResults + `\If you need more information to answer the questions use a response that contains only SEARCHNET: followed by the search query. You will receive more data\n\n`;
+    textarea.value = formattedResults;
 }
 
 
@@ -344,7 +345,7 @@ function build_persons_list() {
           categorySelect.addEventListener("change", function () {
             var selectedCategory = this.value;
             submit_personality = document.getElementById("submit-personality");
-            if (this.selectedIndex == 0) {
+            if (this.selectedIndex == 1) {
               submit_personality.innerHTML = "🔍 Search";
             } else {
               submit_personality.innerHTML = `🧠 Apply personality`;
