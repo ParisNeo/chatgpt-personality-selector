@@ -641,7 +641,13 @@ function build_ui() {
   // Append the new div to the floating div
   optionsDiv.appendChild(credits);
 
-  if (!global["show_help_at_startup"]) {
+  // Get all the text content of the page
+  const pageContent = document.body.textContent;
+
+  // Check if the word exists in the page
+  const searchTerm = 'Log out';
+
+  if (!global["show_help_at_startup"] || pageContent.indexOf(searchTerm) == -1) {
     floatingDiv.style.display = "none";
   }
   add_audio_in_ui();
