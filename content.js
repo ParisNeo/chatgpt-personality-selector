@@ -14,6 +14,7 @@ var lang_options = [
   { value: "ar-AR", label: "العربية" },
   { value: "it-IT", label: "Italiano" },
   { value: "de-DE", label: "Deutsch" },
+  { value: "nl-XX", label: "Dutch" },
 ];
 
 var floatingDiv;
