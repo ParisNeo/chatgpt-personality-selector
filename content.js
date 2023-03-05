@@ -519,6 +519,7 @@ function build_ui() {
   voices = [];
   function populateVoicesList() {
     voices = synth.getVoices();
+    voice_select.innerHTML="";
     for (let i = 0; i < voices.length; i++) {
       if (
         voices[i].lang.startsWith(
