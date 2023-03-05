@@ -41,7 +41,8 @@
         "languages/prompts_fr-FR.csv",
         "languages/prompts_fr-FR_bk.csv",
         "languages/prompts_it-IT.csv",
-        "languages/prompts_nl-XX.csv"
+        "languages/prompts_nl-XX.csv",
+        "languages/prompts_zh_CN.csv"
       ],
       "matches": [
         "https://chat.openai.com/*"
