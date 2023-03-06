@@ -15,7 +15,7 @@ var lang_options = [
   { value: "it-IT", label: "Italiano" },
   { value: "de-DE", label: "Deutsch" },
   { value: "nl-XX", label: "Dutch" },
-  { value: "zh_CN", label: "中國人" }
+  { value: "zh-CN", label: "中國人" }
 ];
 
 var floatingDiv;
