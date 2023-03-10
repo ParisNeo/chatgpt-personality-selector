@@ -15,7 +15,7 @@ var global = {
   language: 0,
   voice: "",
   auto_audio: false,
-  rnd:generateRandomText(10)
+  rnd:generateRandomText(3)+":"+generateRandomText(5)
 };
 console.log(`global : ${JSON.stringify(global)}`)
 
@@ -219,7 +219,7 @@ function chatGPTResults(results, query, lang) {
       ""
     );
 
-    formattedResults = formattedResults + `\If you need more information to answer the questions. Ask the search engine using the syntax ${global.rnd}: followed by the search query. You will receive more data to work with\n\n`;
+    formattedResults = formattedResults + `\If you need more information to answer the questions. Ask the search engine using the syntax ${global.rnd}<search query>. You will receive more data to work with\n\n`;
     textarea.value = formattedResults;
 }
 
@@ -258,6 +258,13 @@ async function search(query) {
   var url = "https://api.duckduckgo.com/?q=" + query + "&format=json";
   return await fetch(url);
 }
+function publish(){
+  textarea = document.querySelector("textarea");
+  textarea.value = personality.prompt.replace(/\$rnd/g, global.rnd);
+  console.log(`replaced`);
+  pressEnter();
+}
+
 
 var personality_select;
 function onSubmit(event) {
@@ -292,7 +299,8 @@ function onSubmit(event) {
 
         api_search(query).then((results) => {
           conditionChatGPT(results, query, lang_options[global.language].label);
-          pressEnter();
+          newChat();
+          setTimeout(publish, 1000);
           isProcessing = false;
         });
       } catch (error) {
@@ -305,10 +313,8 @@ function onSubmit(event) {
         alert(personality.disclaimer);
       }
       console.log(`${global.rnd}`)
-      textarea.value = personality.prompt.replace(/\$rnd/g, global.rnd);
-      console.log(`replaced`);
       newChat();
-      setTimeout(pressEnter, 1000);
+      setTimeout(publish, 1000);
       isProcessing = false;      
     }
   }
@@ -803,7 +809,7 @@ function callback(mutationsList, observer) {
             attachAudio_modules(lastDivWithText);
             let text = lastDivWithText.textContent;
             console.log(`prompt ${text}`);
-            let searchTerm = `${global.rnd}:`;
+            let searchTerm = `${global.rnd}`;
             console.log(`searching ${searchTerm}`)
             let index = text.indexOf(searchTerm);
             if (index !== -1) {
