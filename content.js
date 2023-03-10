@@ -306,9 +306,9 @@ function onSubmit(event) {
       }
       console.log(`${global.rnd}`)
       textarea.value = personality.prompt.replace(/\$rnd/g, global.rnd);
-      console.log(`replaced`)
+      console.log(`replaced`);
       newChat();
-      pressEnter();
+      setTimeout(pressEnter, 1000);
       isProcessing = false;      
     }
   }
