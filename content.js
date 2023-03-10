@@ -1,3 +1,12 @@
+function generateRandomText(length) {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+}
+console.log("Starting")
 let isProcessing = false;
 var global = {
   show_help_at_startup: true,
@@ -6,7 +15,9 @@ var global = {
   language: 0,
   voice: "",
   auto_audio: false,
+  rnd:generateRandomText(10)
 };
+console.log(`global : ${JSON.stringify(global)}`)
 
 var lang_options = [
   { value: "en-US", label: "English" },
@@ -208,10 +219,22 @@ function chatGPTResults(results, query, lang) {
       ""
     );
 
-    formattedResults = formattedResults + `\If you need more information to answer the questions. Ask the search engine using the syntax SEARCHNET: followed by the search query. You will receive more data to work with\n\n`;
+    formattedResults = formattedResults + `\If you need more information to answer the questions. Ask the search engine using the syntax ${global.rnd}: followed by the search query. You will receive more data to work with\n\n`;
     textarea.value = formattedResults;
 }
 
+function newChat(){
+  // Get all <a> tags on the page
+  var links = document.querySelectorAll('a');
+
+  // Loop through the links to find the one with the desired text content
+  for (var i = 0; i < links.length; i++) {
+    if (links[i].textContent === 'New chat') { // replace 'Click me!' with the text content you are looking for
+      links[i].click(); // Simulate a click on the link
+      break; // Stop looping since we found the link we're looking for
+    }
+  }
+}
 
 function pressEnter() {
   textarea.focus();
@@ -281,7 +304,10 @@ function onSubmit(event) {
       if (personality.disclaimer !== "") {
         alert(personality.disclaimer);
       }
-      textarea.value = personality.prompt;
+      console.log(`${global.rnd}`)
+      textarea.value = personality.prompt.replace(/\$rnd/g, global.rnd);
+      console.log(`replaced`)
+      newChat();
       pressEnter();
       isProcessing = false;      
     }
@@ -319,6 +345,7 @@ function build_persons_list() {
   fileUrl = chrome.runtime.getURL(
     `languages/prompts_${lang_options[global.language].value}.csv`
   );
+  console.log("Building persons")
   category_select.innerHTML = "";
   personality_select.innerHTML = "";
   // Use PapaParse to parse the CSV file
@@ -775,10 +802,12 @@ function callback(mutationsList, observer) {
             console.log("Adding audio module")
             attachAudio_modules(lastDivWithText);
             let text = lastDivWithText.textContent;
-            console.log(text);
-            let searchTerm = "SEARCHNET:";
+            console.log(`prompt ${text}`);
+            let searchTerm = `${global.rnd}:`;
+            console.log(`searching ${searchTerm}`)
             let index = text.indexOf(searchTerm);
             if (index !== -1) {
+              console.log(`Found ${index}`)
               let substring = text.substring(index + searchTerm.length);
               console.log(substring);
               try {
@@ -813,7 +842,7 @@ function callback(mutationsList, observer) {
     var links = document.querySelectorAll('a');
     for (var i = 0; i < links.length; i++) {
       // Do something with the link, e.g., add a class to it
-      if (links[i].innerText==="Dark mode")
+      if (links[i].innerText==="Log out")
       {
         link = links[i]
         break;
