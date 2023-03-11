@@ -17,7 +17,7 @@ chrome.runtime.onInstalled.addListener(() => {
       language: 0,
       voice: "",
       auto_audio: false,
-      rnd:generateRandomText(10)
+      rnd:"search_query"
     },
   });
 });

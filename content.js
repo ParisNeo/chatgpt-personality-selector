@@ -15,7 +15,7 @@ var global = {
   language: 0,
   voice: "",
   auto_audio: false,
-  rnd:generateRandomText(3)+":"+generateRandomText(5)
+  rnd:"search_query"
 };
 console.log(`global : ${JSON.stringify(global)}`)
 
@@ -172,16 +172,11 @@ function conditionChatGPT(results, query, lang) {
   formattedResults =
     formattedResults +
     `Instructions:
-    Act as an AI specialized in analyzing web search results.
-    The AI knows how to write different text formats such as latex, markdown and others.
-    In addition to natural interaction, the AI can respond to those personality_select :
-    sentiment,summerize,mksurvey,showperspectives,critisize,list,latex,markdown.
+    Us the search results to answer the question.
     Make sure to cite results using [[number](URL)] notation after the reference to enable the users to click on it and view the source web page.
     Be precise and use academic english.
     Stick to the user requests.
-    The user can formulate requests concerning the search results. respond in a formal manner.\n\n
-    After recovering the web search data, just answer with welcome message and wait for the user command.\n
-    Start by showing the welcome message that explains what you can do in details.\nAll responses should be in ${lang}`;
+    All responses should be in ${lang}`;
   formattedResults = formattedResults + `\nArticles web search results:\n\n`;
   formattedResults =
     formattedResults +
