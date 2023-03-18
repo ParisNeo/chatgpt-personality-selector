@@ -546,7 +546,11 @@ function build_ui() {
   file_input_label.textContent = "Image to talk about";
 
   send_button = document.createElement("button");
-  //send_button.classList.add("input-selects");
+  send_button.classList.add("input-selects");
+  send_button.style.margin_left="30px";
+  send_button.style.width="200px";
+  send_button.style.color="white";
+  
   send_button.textContent = "Send File Path";
 
   const spinner = document.createElement("img");
