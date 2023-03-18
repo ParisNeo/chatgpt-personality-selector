@@ -371,7 +371,10 @@ function build_persons_list() {
           categorySelect.addEventListener("change", function () {
             var selectedCategory = this.value;
             submit_personality = document.getElementById("submit-personality");
-            if (this.selectedIndex == 2) {
+            if (this.selectedIndex == 1) {
+              file_input_div.style.display = "block"; 
+            } else if (this.selectedIndex == 2) {
+              file_input_div.style.display = "block"; 
               submit_personality.innerHTML = "🔍 Search";
             } else {
               submit_personality.innerHTML = `🧠 Apply personality`;
@@ -534,6 +537,58 @@ function build_ui() {
   personality_select_div.appendChild(personality_select_label);
   personality_select_div.appendChild(personality_select);
 
+  // Build file input div
+  file_input_div = document.createElement("div");
+  file_input_div.classList.add("input-select-div");
+
+  file_input_label = document.createElement("label");
+  file_input_label.classList.add("input-select-label");
+  file_input_label.textContent = "Image to talk about";
+
+  send_button = document.createElement("button");
+  //send_button.classList.add("input-selects");
+  send_button.textContent = "Send File Path";
+
+  const spinner = document.createElement("img");
+  spinner.src = "https://parisneo.pythonanywhere.com/spinner.gif";
+  spinner.style.width="10px"
+  spinner.style.height="10px"
+  spinner.style.display="none"
+
+  send_button.addEventListener("click", () => {
+    // Create a file input element and simulate a click event
+    const file_input = document.createElement("input");
+    file_input.type = "file";
+    file_input.accept = "image/*";
+    console.log("Sending request to server");
+    file_input.addEventListener("change", () => {
+      const file = file_input.files[0];
+      // Create a form data object and append the file to it
+      const formData = new FormData();
+      formData.append("image", file);
+      spinner.style.display="block"
+      // Send the form data to the server using a fetch request
+      fetch("http://localhost:5000/set_image", {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.text())
+        .then((text) =>{
+          spinner.style.display="none"
+          alert(text)
+        } )
+        .catch((error) => console.error(error));
+    });
+    file_input.click();
+  });
+  
+  file_input_div.appendChild(file_input_label);
+  file_input_div.appendChild(send_button);
+  file_input_div.appendChild(spinner);
+  file_input_div.style.display = "none"; 
+
+
+
   build_persons_list();
 
   voice_select_label = document.createElement("label");
@@ -661,6 +716,7 @@ function build_ui() {
   optionsDiv.appendChild(language_div);
   optionsDiv.appendChild(category_select_div);
   optionsDiv.appendChild(personality_select_div);
+  optionsDiv.appendChild(file_input_div);
   optionsDiv.appendChild(voice_select_div);
 
   optionsDiv.appendChild(autoread_div);
@@ -803,6 +859,8 @@ function callback(mutationsList, observer) {
             attachAudio_modules(lastDivWithText);
             let text = lastDivWithText.textContent;
             console.log(`prompt ${text}`);
+
+            // Detect websearch request
             let searchTerm = `${global.rnd}`;
             console.log(`searching ${searchTerm}`)
             let index = text.indexOf(searchTerm);
@@ -834,7 +892,51 @@ function callback(mutationsList, observer) {
               }
               // Do something with the extracted substring
             }
-            
+            // Detect image_questions
+            searchTerm = `BLIP:`;
+            console.log(`searching ${searchTerm}`)
+            index = text.indexOf(searchTerm);
+            if (index !== -1) {
+              console.log(`Found ${index}`)
+              let substring = text.substring(index + searchTerm.length).replace(/^"|"$/g, '');
+              console.log(substring);
+              try {
+                const questions = substring.split("|");
+
+                const spinner = document.createElement("img");
+                spinner.src = "https://parisneo.pythonanywhere.com/spinner.gif";
+                spinner.style.width="10px"
+                spinner.style.height="10px"
+                textarea.appendChild(spinner);
+                fetch("http://localhost:5000/question", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json"
+                  },
+                  body: JSON.stringify({ questions: questions })
+                })
+                .then(response => {
+                  if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  console.log(data)
+                  textarea = document.querySelector("textarea");
+                  textarea.value = data.answers.join('|');
+                  pressEnter();
+                  console.log(data);
+                })
+                .catch(error => {
+                  console.error("There was a problem with the fetch operation:", error);
+                });
+              } catch (error) {
+                isProcessing = false;
+                showErrorMessage(error);
+              }
+              // Do something with the extracted substring
+            }            
           }
         }
       }
