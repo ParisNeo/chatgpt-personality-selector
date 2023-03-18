@@ -7,6 +7,8 @@
 
 ChatGPT Personality Selector is a Google Chrome extension that allows users to customize their chatbot experience. With this extension, users can easily condition their chatbot to become a person or tool specialized in a specific area such as an educator, doctor, translator, password generator, stand-up comedian, psychic, expert in startup creation, developer, prompt generator for art AI, coding helper, Dungeon and Dragons game master, or even a Linux, python or other terminal and many more (more than 176 personalizations in two languages for now).
 
+It can also be used to extend chatgpt and make it talk with external tools like doing websearches and talking to an image question/answering tool. With this, you can pump up your usage of chatgpt as you can show it images and ask it to use that for building websites or whatever you need. You can also ask it to find you a product based of your own specifications. It can produce Art in many forms. 
+
 The extension also includes an interesting feature, a text-based game including Dungeon and Dragons (DnD) which is fun and engaging. Additionally, the extension includes a text-to-speech tool which makes the interaction with the AI very natural.
 
 To use the extension, users simply select the desired personality from the large set of options and press the validation button. The chatbot will then be instantly transformed and ready to perform the specific task with ease.
