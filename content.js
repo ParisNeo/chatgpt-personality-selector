@@ -15,7 +15,7 @@ var global = {
   language: 0,
   voice: "",
   auto_audio: false,
-  rnd:"search_query"
+  rnd:"search_query:"
 };
 console.log(`global : ${JSON.stringify(global)}`)
 
@@ -244,15 +244,11 @@ function pressEnter() {
 
 // use &max_results= to set the maximum number of results expoected
 async function api_search(query) {
-  var url = `https://ddg-webapp-aagd.vercel.app/search?&q=${query}`;
+  var url = `https://parisneo.pythonanywhere.com/search?&q=${query}`;
   const response = await fetch(url);
   return await response.json();
 }
 
-async function search(query) {
-  var url = "https://api.duckduckgo.com/?q=" + query + "&format=json";
-  return await fetch(url);
-}
 function publish(){
   textarea = document.querySelector("textarea");
   textarea.value = personality.prompt.replace(/\$rnd/g, global.rnd);
@@ -375,7 +371,7 @@ function build_persons_list() {
           categorySelect.addEventListener("change", function () {
             var selectedCategory = this.value;
             submit_personality = document.getElementById("submit-personality");
-            if (this.selectedIndex == 1) {
+            if (this.selectedIndex == 2) {
               submit_personality.innerHTML = "🔍 Search";
             } else {
               submit_personality.innerHTML = `🧠 Apply personality`;
@@ -463,6 +459,9 @@ function build_ui() {
   submit_personality.id = "submit-personality";
   submit_personality.innerHTML = `🧠 Apply personality`;
   submit_personality.addEventListener("click", onSubmit);
+
+  // Add the form to the page
+
 
   language_div = document.createElement("div");
   language_div.classList.add("input-select-div");
@@ -809,7 +808,7 @@ function callback(mutationsList, observer) {
             let index = text.indexOf(searchTerm);
             if (index !== -1) {
               console.log(`Found ${index}`)
-              let substring = text.substring(index + searchTerm.length);
+              let substring = text.substring(index + searchTerm.length).replace(/^"|"$/g, '');
               console.log(substring);
               try {
                 let query = substring;
