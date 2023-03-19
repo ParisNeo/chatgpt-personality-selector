@@ -417,19 +417,22 @@ function build_persons_list() {
             categorySelect.addEventListener("change", function () {
               var selectedCategory = this.value;
               global.selected_category = this.selectedIndex;
+              file_input_div = document.getElementById("file_input_div");
               submit_personality = document.getElementById("submit-personality");
+              console.log(`Selecting category ${file_input_div.innerHTML}`)
               if (this.selectedIndex == 0){
                 submit_personality.innerHTML = `🧠 Apply personality`;
                 file_input_div.style.display = "none"; 
               }
               else if (this.selectedIndex == 1) {
-                file_input_div.style.display = "none"; 
+                console.log("Enabling images")
+                file_input_div.style.display = "block"; 
                 submit_personality.innerHTML = `🧠 Apply personality`;
               } else if (this.selectedIndex == 2) {
                 file_input_div.style.display = "none"; 
                 submit_personality.innerHTML = "🔍 Search";
               } else if (this.selectedIndex == 3) {
-                file_input_div.style.display = "block"; 
+                file_input_div.style.display = "none"; 
                 submit_personality.innerHTML = "🧠 Apply personality";
               } else {
                 file_input_div.style.display = "none"; 
@@ -666,6 +669,7 @@ function build_ui() {
   // Build file input div
   file_input_div = document.createElement("div");
   file_input_div.classList.add("input-select-div");
+  file_input_div.id = "file_input_div"
 
   file_input_label = document.createElement("label");
   file_input_label.classList.add("input-select-label");

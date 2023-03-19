@@ -103,11 +103,11 @@ button:hover{
     display: flex;
     flex-direction: column;
     width: 500px;
-    height: 600px;
+    height: 650px;
     left: 50%;
     top: 50%;
     margin-left: -150px;
-    margin-top: -250px;
+    margin-top: -275px;
     background-color: #333;
     border-radius: 10px;
     box-shadow: 2px 2px 10px #888888;
