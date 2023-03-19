@@ -15,7 +15,13 @@ var global = {
   language: 0,
   voice: "",
   auto_audio: false,
-  rnd:"search_query:"
+  search_trigger_key_word:"search_query:",
+  blip_trigger_key_word:"BLIP:",
+  console_trigger_key_word:"TRIGGER_CONSOLE",
+
+  intersept_search_keyword:true,
+  intersept_blip_keyword:true,
+  intersept_console_keyword:true
 };
 console.log(`global : ${JSON.stringify(global)}`)
 
@@ -48,6 +54,45 @@ let isStarted = false;
 let isSpeaking = false;
 
 var language_select;
+
+function extractBlocks(text, trigger_key_word) {
+  const regex = new RegExp(`@<${trigger_key_word}([^>]*)>?@`, 'g');
+  const matches = text.match(regex);
+  if (matches) {
+    let result = '';
+    for (const match of matches) {
+      console.log(match)
+      console.log(`${2 + trigger_key_word.length}`)
+      console.log(`${match.length - 2}`)
+      result += match.substring(2 + trigger_key_word.length, match.length - 2) + '\n';
+    }
+    return result;
+  }
+  console.log("No matches found");
+  return '';
+}
+
+
+
+// Running commands on console for chatgpt to use in personality that uses 
+async function runCommand(command) {
+  const response = await fetch('http://localhost:5000/command', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ command })
+  });
+  
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  const data = await response.json();
+  const output = data.output.join('\n');
+  return output;
+}
+
 
 function get_lastdiv_with_text(divs) {
   var lastDivWithText;
@@ -214,7 +259,7 @@ function chatGPTResults(results, query, lang) {
       ""
     );
 
-    formattedResults = formattedResults + `\If you need more information to answer the questions. Ask the search engine using the syntax ${global.rnd}<search query>. You will receive more data to work with\n\n`;
+    formattedResults = formattedResults + `\If you need more information to answer the questions. Ask the search engine using the syntax ${global.search_trigger_key_word}<search query>. You will receive more data to work with\n\n`;
     textarea.value = formattedResults;
 }
 
@@ -242,7 +287,7 @@ function pressEnter() {
   textarea.dispatchEvent(enterEvent);
 }
 
-// use &max_results= to set the maximum number of results expoected
+// use &max_results= to set the maximum number of results expoectedpersonality-select
 async function api_search(query) {
   var url = `https://parisneo.pythonanywhere.com/search?&q=${query}`;
   const response = await fetch(url);
@@ -251,7 +296,7 @@ async function api_search(query) {
 
 function publish(){
   textarea = document.querySelector("textarea");
-  textarea.value = personality.prompt.replace(/\$rnd/g, global.rnd);
+  textarea.value = personality.prompt.replace(/\$search_trigger_key_word/g, global.search_trigger_key_word);
   console.log(`replaced`);
   pressEnter();
 }
@@ -303,7 +348,7 @@ function onSubmit(event) {
       if (personality.disclaimer !== "") {
         alert(personality.disclaimer);
       }
-      console.log(`${global.rnd}`)
+      console.log(`${global.search_trigger_key_word}`)
       newChat();
       setTimeout(publish, 1000);
       isProcessing = false;      
@@ -368,18 +413,28 @@ function build_persons_list() {
           });
 
           // listen for change event on first select element
-          categorySelect.addEventListener("change", function () {
-            var selectedCategory = this.value;
-            submit_personality = document.getElementById("submit-personality");
-            if (this.selectedIndex == 1) {
-              file_input_div.style.display = "block"; 
-            } else if (this.selectedIndex == 2) {
-              file_input_div.style.display = "block"; 
-              submit_personality.innerHTML = "🔍 Search";
-            } else {
-              submit_personality.innerHTML = `🧠 Apply personality`;
-            }
-
+          setTimeout(function () {
+            categorySelect.addEventListener("change", function () {
+              var selectedCategory = this.value;
+              global.selected_category = this.selectedIndex;
+              submit_personality = document.getElementById("submit-personality");
+              if (this.selectedIndex == 0){
+                submit_personality.innerHTML = `🧠 Apply personality`;
+                file_input_div.style.display = "none"; 
+              }
+              else if (this.selectedIndex == 1) {
+                file_input_div.style.display = "none"; 
+                submit_personality.innerHTML = `🧠 Apply personality`;
+              } else if (this.selectedIndex == 2) {
+                file_input_div.style.display = "none"; 
+                submit_personality.innerHTML = "🔍 Search";
+              } else if (this.selectedIndex == 3) {
+                file_input_div.style.display = "block"; 
+                submit_personality.innerHTML = "🧠 Apply personality";
+              } else {
+                file_input_div.style.display = "none"; 
+                submit_personality.innerHTML = `🧠 Apply personality`;
+              }
             // filter data based on selected category
             var personalities = data
               .filter(function (item) {
@@ -393,28 +448,30 @@ function build_persons_list() {
                 };
               });
 
-            // remove duplicate personalities
-            personalities = Array.from(new Set(personalities));
+              // remove duplicate personalities
+              personalities = Array.from(new Set(personalities));
 
-            // populate second select element with personalities
-            var personalitySelect =
-              document.getElementById("personality-select");
-            personalitySelect.innerHTML = "";
-            personalities.forEach(function (personality) {
-              var option = document.createElement("option");
-              option.value = JSON.stringify(personality);
-              option.text = personality.personality;
-              personalitySelect.add(option);
-            });
-            // set the last selected personality as the selected option
-            personalitySelect.selectedIndex = global.selected_personality;
-          });
+              // populate second select element with personalities
+              var personalitySelect =
+                document.getElementById("personality-select");
+              personalitySelect.innerHTML = "";
+              personalities.forEach(function (personality) {
+                var option = document.createElement("option");
+                option.value = JSON.stringify(personality);
+                option.text = personality.personality;
+                personalitySelect.add(option);
+              });
+              // set the last selected personality as the selected option
+              personalitySelect.selectedIndex = global.selected_personality;
+            });                    
+            var event = new Event("change");
+            categorySelect.dispatchEvent(event);
+            },1000);
+
           // set the last selected category as the selected option
           var selectedCategory = global.selected_category;
           categorySelect.selectedIndex = selectedCategory;
           // trigger change event to populate the second select element
-          var event = new Event("change");
-          categorySelect.dispatchEvent(event);
         },
       });
     });
@@ -461,7 +518,76 @@ function build_ui() {
 
   submit_personality.id = "submit-personality";
   submit_personality.innerHTML = `🧠 Apply personality`;
-  submit_personality.addEventListener("click", onSubmit);
+  submit_personality.addEventListener("click", function () {
+    submit_personality = this;
+    var selectedCategory = global.selected_category;
+    console.log(selectedCategory)
+    if (selectedCategory == 0){
+      if(global.intersept_search_keyword==false)
+      {
+        // get the checkbox element
+        const checkbox = document.getElementById('intercept_search_checkbox');
+
+        // ask the user a yes or no question
+        const confirmed = confirm('This category of personalities requires activating search keyword interception. Are you ok with that?');
+
+        // if the user confirmed, check the checkbox
+        if (confirmed) {
+          checkbox.checked = true;
+          global.intersept_search_keyword=true;
+        }
+      }
+
+    }
+    else if (selectedCategory == 1) {
+      if(global.intersept_blip_keyword==false)
+      {
+        // get the checkbox element
+        const checkbox = document.getElementById('intercept_blip_checkbox');
+
+        // ask the user a yes or no question
+        const confirmed = confirm('This category of personalities requires activating blip keyword interception. Are you ok with that?');
+
+        // if the user confirmed, check the checkbox
+        if (confirmed) {
+          checkbox.checked = true;
+          global.intersept_blip_keyword=true;
+        }
+      }
+
+    } else if (selectedCategory == 2) {
+      if(global.intersept_search_keyword==false)
+      {
+        // get the checkbox element
+        const checkbox = document.getElementById('intercept_search_checkbox');
+
+        // ask the user a yes or no question
+        const confirmed = confirm('This category of personalities requires activating search keyword interception. Are you ok with that?');
+
+        // if the user confirmed, check the checkbox
+        if (confirmed) {
+          checkbox.checked = true;
+          global.intersept_search_keyword=true;
+        }
+      }
+    } else if (selectedCategory == 3) {
+      if(global.intersept_search_keyword==false)
+      {
+        // get the checkbox element
+        const checkbox = document.getElementById('intercept_console_checkbox');
+
+        // ask the user a yes or no question
+        const confirmed = confirm('This category of personalities requires activating console keyword interception. Are you ok with that?');
+
+        // if the user confirmed, check the checkbox
+        if (confirmed) {
+          checkbox.checked = true;
+          global.intersept_search_keyword=true;
+        }
+      }
+    } 
+    onSubmit();
+  } );
 
   // Add the form to the page
 
@@ -682,6 +808,88 @@ function build_ui() {
   show_at_startup_div.appendChild(show_at_startup_label);
   show_at_startup_div.appendChild(show_at_startup);
 
+
+
+
+  // ================================settings
+  // Create a div to hold the checkboxes
+  let checkboxes_div = document.createElement("div");
+
+  // Create checkbox for intercept_search_keyword
+  let intercept_search_checkbox_div = document.createElement("div");
+  intercept_search_checkbox_div.classList.add("input-select-div");
+
+  let intercept_search_checkbox_label = document.createElement("label");
+  intercept_search_checkbox_label.classList.add("input-select-label");
+  intercept_search_checkbox_label.textContent = "Intercept search keyword?";
+
+  let intercept_search_checkbox = document.createElement("input");
+  intercept_search_checkbox.id = "intercept_search_checkbox";
+  intercept_search_checkbox.classList.add("input-checkbox");
+  intercept_search_checkbox.type = "checkbox";
+
+  intercept_search_checkbox.addEventListener("click", function () {
+    global["intercept_search_keyword"] = this.checked;
+    chrome.storage.sync.set({ global: global });
+  });
+  intercept_search_checkbox.checked = global["intercept_search_keyword"];
+
+  intercept_search_checkbox_div.appendChild(intercept_search_checkbox_label);
+  intercept_search_checkbox_div.appendChild(intercept_search_checkbox);
+
+  checkboxes_div.appendChild(intercept_search_checkbox_div);
+
+  // Create checkbox for intercept_blip_keyword
+  let intercept_blip_checkbox_div = document.createElement("div");
+  intercept_blip_checkbox_div.classList.add("input-select-div");
+
+  let intercept_blip_checkbox_label = document.createElement("label");
+  intercept_blip_checkbox_label.classList.add("input-select-label");
+  intercept_blip_checkbox_label.textContent = "Intercept blip keyword?";
+
+  let intercept_blip_checkbox = document.createElement("input");
+  intercept_blip_checkbox.id = "intercept_blip_checkbox";
+  intercept_blip_checkbox.classList.add("input-checkbox");
+  intercept_blip_checkbox.type = "checkbox";
+
+  intercept_blip_checkbox.addEventListener("click", function () {
+    global["intercept_blip_keyword"] = this.checked;
+    chrome.storage.sync.set({ global: global });
+  });
+  intercept_blip_checkbox.checked = global["intercept_blip_keyword"];
+
+  intercept_blip_checkbox_div.appendChild(intercept_blip_checkbox_label);
+  intercept_blip_checkbox_div.appendChild(intercept_blip_checkbox);
+
+  checkboxes_div.appendChild(intercept_blip_checkbox_div);
+
+  // Create checkbox for intercept_console_keyword
+  let intercept_console_checkbox_div = document.createElement("div");
+  intercept_console_checkbox_div.classList.add("input-select-div");
+
+  let intercept_console_checkbox_label = document.createElement("label");
+  intercept_console_checkbox_label.id = "intercept_console_checkbox_label";
+  intercept_console_checkbox_label.classList.add("input-select-label");
+  intercept_console_checkbox_label.textContent = "Intercept console keyword?";
+
+  let intercept_console_checkbox = document.createElement("input");
+  intercept_console_checkbox.classList.add("input-checkbox");
+  intercept_console_checkbox.type = "checkbox";
+
+  intercept_console_checkbox.addEventListener("click", function () {
+    global["intercept_console_keyword"] = this.checked;
+    chrome.storage.sync.set({ global: global });
+  });
+  intercept_console_checkbox.checked = global["intercept_console_keyword"];
+
+  intercept_console_checkbox_div.appendChild(intercept_console_checkbox_label);
+  intercept_console_checkbox_div.appendChild(intercept_console_checkbox);
+
+  checkboxes_div.appendChild(intercept_console_checkbox_div);
+
+
+  
+
   var credits = document.createElement("div");
   credits.innerHTML = `<footer style="text-align:center;width:100%;">
   This app is built by ParisNeo with the help of ChatGPT<br>
@@ -725,6 +933,8 @@ function build_ui() {
 
   optionsDiv.appendChild(autoread_div);
   optionsDiv.appendChild(show_at_startup_div);
+  optionsDiv.appendChild(checkboxes_div);
+  
   optionsDiv.appendChild(submit_personality);
 
   // Append the new div to the floating div
@@ -865,82 +1075,125 @@ function callback(mutationsList, observer) {
             console.log(`prompt ${text}`);
 
             // Detect websearch request
-            let searchTerm = `${global.rnd}`;
-            console.log(`searching ${searchTerm}`)
-            let index = text.indexOf(searchTerm);
-            if (index !== -1) {
-              console.log(`Found ${index}`)
-              let substring = text.substring(index + searchTerm.length).replace(/^"|"$/g, '');
-              console.log(substring);
-              try {
-                let query = substring;
-                if (!query.includes("&max_results=")) {
-                  // &max_results= not found in query, so add it
-                  query += "&max_results=10";
-                }
-                query = query.trim();
-        
-                if (query === "") {
-                  isProcessing = false;
-                  return;
-                }
-                console.log(`Query ${query}`)
-                api_search(query).then((results) => {
-                  chatGPTResults(results, query, lang_options[global.language].label);
-                  pressEnter();
-                  isProcessing = false;
-                });
-              } catch (error) {
-                isProcessing = false;
-                showErrorMessage(error);
-              }
-              // Do something with the extracted substring
-            }
-            // Detect image_questions
-            searchTerm = `BLIP:`;
-            console.log(`searching ${searchTerm}`)
-            index = text.indexOf(searchTerm);
-            if (index !== -1) {
-              console.log(`Found ${index}`)
-              let substring = text.substring(index + searchTerm.length).replace(/^"|"$/g, '');
-              console.log(substring);
-              try {
-                const questions = substring.split("|");
-
-                const spinner = document.createElement("img");
-                spinner.src = "https://parisneo.pythonanywhere.com/spinner.gif";
-                spinner.style.width="10px"
-                spinner.style.height="10px"
-                textarea.appendChild(spinner);
-                fetch("http://localhost:5000/question", {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json"
-                  },
-                  body: JSON.stringify({ questions: questions })
-                })
-                .then(response => {
-                  if (!response.ok) {
-                    throw new Error("Network response was not ok");
+            if(global.intersept_search_keyword)
+            {
+              let searchTerm = `${global.search_trigger_key_word}`;
+              console.log(`searching ${searchTerm}`)
+              let index = text.indexOf(searchTerm);
+              if (index !== -1) {
+                console.log(`Found ${index}`)
+                let substring = text.substring(index + searchTerm.length).replace(/^"|"$/g, '');
+                console.log(substring);
+                try {
+                  let query = substring;
+                  if (!query.includes("&max_results=")) {
+                    // &max_results= not found in query, so add it
+                    query += "&max_results=10";
                   }
-                  return response.json();
-                })
-                .then(data => {
-                  console.log(data)
-                  textarea = document.querySelector("textarea");
-                  textarea.value = data.answers.join('|');
-                  pressEnter();
-                  console.log(data);
-                })
-                .catch(error => {
-                  console.error("There was a problem with the fetch operation:", error);
-                });
-              } catch (error) {
-                isProcessing = false;
-                showErrorMessage(error);
+                  query = query.trim();
+          
+                  if (query === "") {
+                    isProcessing = false;
+                    return;
+                  }
+                  console.log(`Query ${query}`)
+                  api_search(query).then((results) => {
+                    chatGPTResults(results, query, lang_options[global.language].label);
+                    pressEnter();
+                    isProcessing = false;
+                  });
+                } catch (error) {
+                  isProcessing = false;
+                  showErrorMessage(error);
+                }
+                // Do something with the extracted substring
               }
-              // Do something with the extracted substring
-            }            
+            }
+            
+            if(global.intersept_blip_keyword)
+            {
+              // Detect image_questions
+              searchTerm =  `${global.blip_trigger_key_word}`;
+              console.log(`searching ${searchTerm}`)
+              index = text.indexOf(searchTerm);
+              if (index !== -1) {
+                console.log(`Found ${index}`)
+                let substring = text.substring(index + searchTerm.length).replace(/^"|"$/g, '');
+                console.log(substring);
+                try {
+                  const questions = substring.split("|");
+
+                  const spinner = document.createElement("img");
+                  spinner.src = "https://parisneo.pythonanywhere.com/spinner.gif";
+                  spinner.style.width="10px"
+                  spinner.style.height="10px"
+                  textarea.appendChild(spinner);
+                  fetch("http://localhost:5000/question", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ questions: questions })
+                  })
+                  .then(response => {
+                    if (!response.ok) {
+                      throw new Error("Network response was not ok");
+                    }
+                    return response.json();
+                  })
+                  .then(data => {
+                    console.log(data)
+                    textarea = document.querySelector("textarea");
+                    textarea.value = data.answers.join('|');
+                    pressEnter();
+                    console.log(data);
+                  })
+                  .catch(error => {
+                    console.error("There was a problem with the fetch operation:", error);
+                  });
+                } catch (error) {
+                  isProcessing = false;
+                  showErrorMessage(error);
+                }
+                // Do something with the extracted substring
+              }    
+            }
+            if (global.intersept_console_keyword)
+            {
+              // Detect console_commands
+              try{
+                console.log(`Trying to find ${global.console_trigger_key_word}`)
+                searchTerm =  `${global.console_trigger_key_word}`;
+                blks = extractBlocks(text, global.console_trigger_key_word)
+                console.log(`blocks ${blks}\nfrom\n${text}`)
+                if (blks !== '') {
+                  console.log(`Found ${blks}`)
+                  let substring = blks;
+                  console.log(substring);
+                  try {
+                    response = runCommand(substring)  .then(output => {
+                      console.log(output);
+                      textarea = document.querySelector("textarea");
+                      textarea.value = output;
+                      pressEnter();
+                    })
+                    .catch(error => {
+                      console.error(error);
+                      // Handle the error
+                    });
+                  } catch (error) {
+                    isProcessing = false;
+                    showErrorMessage(error);
+                  }
+                  // Do something with the extracted substring
+                }
+              } catch (error) {
+                console.log(error)
+              }
+            }
+            
+
+            
           }
         }
       }

@@ -17,7 +17,12 @@ chrome.runtime.onInstalled.addListener(() => {
       language: 0,
       voice: "",
       auto_audio: false,
-      rnd:"search_query"
+      search_trigger_key_word:"search_query:",
+      blip_trigger_key_word:"BLIP:",
+      console_trigger_key_word:"TRIGGER_CONSOLE",
+      intersept_search_keyword:false,
+      intersept_blip_keyword:false,
+      intersept_console_keyword:false
     },
   });
 });
