@@ -827,6 +827,7 @@ function build_ui() {
   intercept_search_checkbox.id = "intercept_search_checkbox";
   intercept_search_checkbox.classList.add("input-checkbox");
   intercept_search_checkbox.type = "checkbox";
+  intercept_search_checkbox.checked = global.intersept_search_keyword
 
   intercept_search_checkbox.addEventListener("click", function () {
     global["intercept_search_keyword"] = this.checked;
@@ -851,6 +852,7 @@ function build_ui() {
   intercept_blip_checkbox.id = "intercept_blip_checkbox";
   intercept_blip_checkbox.classList.add("input-checkbox");
   intercept_blip_checkbox.type = "checkbox";
+  intercept_blip_checkbox.checked = global.intersept_blip_keyword
 
   intercept_blip_checkbox.addEventListener("click", function () {
     global["intercept_blip_keyword"] = this.checked;
@@ -875,6 +877,7 @@ function build_ui() {
   let intercept_console_checkbox = document.createElement("input");
   intercept_console_checkbox.classList.add("input-checkbox");
   intercept_console_checkbox.type = "checkbox";
+  intercept_console_checkbox.checked = global.intersept_console_keyword
 
   intercept_console_checkbox.addEventListener("click", function () {
     global["intercept_console_keyword"] = this.checked;
