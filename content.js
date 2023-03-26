@@ -538,6 +538,7 @@ function build_ui() {
         if (confirmed) {
           checkbox.checked = true;
           global.intercept_search_keyword=true;
+          chrome.storage.sync.set({ global: global });
         }
       }
 
@@ -555,6 +556,7 @@ function build_ui() {
         if (confirmed) {
           checkbox.checked = true;
           global.intercept_blip_keyword=true;
+          chrome.storage.sync.set({ global: global });
         }
       }
 
@@ -571,6 +573,7 @@ function build_ui() {
         if (confirmed) {
           checkbox.checked = true;
           global.intercept_search_keyword=true;
+          chrome.storage.sync.set({ global: global });
         }
       }
     } else if (selectedCategory == 3) {
@@ -586,6 +589,7 @@ function build_ui() {
         if (confirmed) {
           checkbox.checked = true;
           global.intercept_search_keyword=true;
+          chrome.storage.sync.set({ global: global });
         }
       }
     } 
