@@ -19,9 +19,9 @@ var global = {
   blip_trigger_key_word:"BLIP:",
   console_trigger_key_word:"TRIGGER_CONSOLE",
 
-  intersept_search_keyword:true,
-  intersept_blip_keyword:true,
-  intersept_console_keyword:true
+  intercept_search_keyword:true,
+  intercept_blip_keyword:true,
+  intercept_console_keyword:true
 };
 console.log(`global : ${JSON.stringify(global)}`)
 
@@ -526,7 +526,7 @@ function build_ui() {
     var selectedCategory = global.selected_category;
     console.log(selectedCategory)
     if (selectedCategory == 0){
-      if(global.intersept_search_keyword==false)
+      if(global.intercept_search_keyword==false)
       {
         // get the checkbox element
         const checkbox = document.getElementById('intercept_search_checkbox');
@@ -537,13 +537,13 @@ function build_ui() {
         // if the user confirmed, check the checkbox
         if (confirmed) {
           checkbox.checked = true;
-          global.intersept_search_keyword=true;
+          global.intercept_search_keyword=true;
         }
       }
 
     }
     else if (selectedCategory == 1) {
-      if(global.intersept_blip_keyword==false)
+      if(global.intercept_blip_keyword==false)
       {
         // get the checkbox element
         const checkbox = document.getElementById('intercept_blip_checkbox');
@@ -554,12 +554,12 @@ function build_ui() {
         // if the user confirmed, check the checkbox
         if (confirmed) {
           checkbox.checked = true;
-          global.intersept_blip_keyword=true;
+          global.intercept_blip_keyword=true;
         }
       }
 
     } else if (selectedCategory == 2) {
-      if(global.intersept_search_keyword==false)
+      if(global.intercept_search_keyword==false)
       {
         // get the checkbox element
         const checkbox = document.getElementById('intercept_search_checkbox');
@@ -570,11 +570,11 @@ function build_ui() {
         // if the user confirmed, check the checkbox
         if (confirmed) {
           checkbox.checked = true;
-          global.intersept_search_keyword=true;
+          global.intercept_search_keyword=true;
         }
       }
     } else if (selectedCategory == 3) {
-      if(global.intersept_search_keyword==false)
+      if(global.intercept_search_keyword==false)
       {
         // get the checkbox element
         const checkbox = document.getElementById('intercept_console_checkbox');
@@ -585,7 +585,7 @@ function build_ui() {
         // if the user confirmed, check the checkbox
         if (confirmed) {
           checkbox.checked = true;
-          global.intersept_search_keyword=true;
+          global.intercept_search_keyword=true;
         }
       }
     } 
@@ -831,7 +831,7 @@ function build_ui() {
   intercept_search_checkbox.id = "intercept_search_checkbox";
   intercept_search_checkbox.classList.add("input-checkbox");
   intercept_search_checkbox.type = "checkbox";
-  intercept_search_checkbox.checked = global.intersept_search_keyword
+  intercept_search_checkbox.checked = global.intercept_search_keyword
 
   intercept_search_checkbox.addEventListener("click", function () {
     global["intercept_search_keyword"] = this.checked;
@@ -856,7 +856,7 @@ function build_ui() {
   intercept_blip_checkbox.id = "intercept_blip_checkbox";
   intercept_blip_checkbox.classList.add("input-checkbox");
   intercept_blip_checkbox.type = "checkbox";
-  intercept_blip_checkbox.checked = global.intersept_blip_keyword
+  intercept_blip_checkbox.checked = global.intercept_blip_keyword
 
   intercept_blip_checkbox.addEventListener("click", function () {
     global["intercept_blip_keyword"] = this.checked;
@@ -881,7 +881,7 @@ function build_ui() {
   let intercept_console_checkbox = document.createElement("input");
   intercept_console_checkbox.classList.add("input-checkbox");
   intercept_console_checkbox.type = "checkbox";
-  intercept_console_checkbox.checked = global.intersept_console_keyword
+  intercept_console_checkbox.id = "intercept_console_checkbox";
 
   intercept_console_checkbox.addEventListener("click", function () {
     global["intercept_console_keyword"] = this.checked;
@@ -1082,10 +1082,10 @@ function callback(mutationsList, observer) {
             console.log(`prompt ${text}`);
 
             // Detect websearch request
-            if(global.intersept_search_keyword)
+            if(global.intercept_search_keyword)
             {
               let searchTerm = `${global.search_trigger_key_word}`;
-              console.log(`searching ${searchTerm}`)
+              console.log(`searching ${searchTerm} keyword`)
               let index = text.indexOf(searchTerm);
               if (index !== -1) {
                 console.log(`Found ${index}`)
@@ -1116,16 +1116,21 @@ function callback(mutationsList, observer) {
                 // Do something with the extracted substring
               }
             }
+            else{
+              console.log("No search Keyword found")
+            }
             
-            if(global.intersept_blip_keyword)
+            if(global.intercept_blip_keyword)
             {
               // Detect image_questions
               searchTerm =  `${global.blip_trigger_key_word}`;
-              console.log(`searching ${searchTerm}`)
+              console.log(`searching ${searchTerm} keyword`)
               index = text.indexOf(searchTerm);
               if (index !== -1) {
                 console.log(`Found ${index}`)
                 let substring = text.substring(index + searchTerm.length).replace(/^"|"$/g, '');
+                console.log(substring);
+                substring = substring.replace(/^\n+/, "").split("\n")[0];
                 console.log(substring);
                 try {
                   const questions = substring.split("|");
@@ -1165,8 +1170,13 @@ function callback(mutationsList, observer) {
                 // Do something with the extracted substring
               }    
             }
-            if (global.intersept_console_keyword)
+            else{
+              console.log("No blip Keyword found")
+            }
+            
+            if (global.intercept_console_keyword)
             {
+              console.log("Searching console keyword")
               // Detect console_commands
               try{
                 console.log(`Trying to find ${global.console_trigger_key_word}`)
