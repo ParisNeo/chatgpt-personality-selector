@@ -20,8 +20,7 @@ chrome.runtime.onInstalled.addListener(() => {
       search_trigger_key_word:"search_query:",
       blip_trigger_key_word:"BLIP:",
       console_trigger_key_word:"TRIGGER_CONSOLE",
-      intersept_search_keyword:true,
-      intersept_blip_keyword:true,
+      is_first_run:true,
       intersept_console_keyword:true
     },
   });

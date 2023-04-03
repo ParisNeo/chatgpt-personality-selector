@@ -18,9 +18,7 @@ var global = {
   search_trigger_key_word:"search_query:",
   blip_trigger_key_word:"BLIP:",
   console_trigger_key_word:"TRIGGER_CONSOLE",
-
-  intercept_search_keyword:true,
-  intercept_blip_keyword:true,
+  is_first_run:true,
   intercept_console_keyword:true
 };
 console.log(`global : ${JSON.stringify(global)}`)
@@ -402,7 +400,7 @@ function build_persons_list() {
           var categories = Array.from(
             new Set(data.map((item) => item.category))
           );
-
+          console.log("here")
           // populate first select element with categories
           var categorySelect = document.getElementById("category-select");
           categories.forEach(function (category) {
@@ -525,29 +523,11 @@ function build_ui() {
     submit_personality = this;
     var selectedCategory = global.selected_category;
     console.log(selectedCategory)
-    if (selectedCategory == 0){
-      if(global.intercept_search_keyword==false)
+    if (selectedCategory == 1) {
+      if(global.intercept_console_keyword==false)
       {
         // get the checkbox element
-        const checkbox = document.getElementById('intercept_search_checkbox');
-
-        // ask the user a yes or no question
-        const confirmed = confirm('This category of personalities requires activating search keyword interception. Are you ok with that?');
-
-        // if the user confirmed, check the checkbox
-        if (confirmed) {
-          checkbox.checked = true;
-          global.intercept_search_keyword=true;
-          chrome.storage.sync.set({ global: global });
-        }
-      }
-
-    }
-    else if (selectedCategory == 1) {
-      if(global.intercept_blip_keyword==false)
-      {
-        // get the checkbox element
-        const checkbox = document.getElementById('intercept_blip_checkbox');
+        const checkbox = document.getElementById('intercept_console_checkbox');
 
         // ask the user a yes or no question
         const confirmed = confirm('This category of personalities requires activating blip keyword interception. Are you ok with that?');
@@ -555,44 +535,12 @@ function build_ui() {
         // if the user confirmed, check the checkbox
         if (confirmed) {
           checkbox.checked = true;
-          global.intercept_blip_keyword=true;
+          global.intercept_console_keyword=true;
           chrome.storage.sync.set({ global: global });
         }
       }
 
-    } else if (selectedCategory == 2) {
-      if(global.intercept_search_keyword==false)
-      {
-        // get the checkbox element
-        const checkbox = document.getElementById('intercept_search_checkbox');
-
-        // ask the user a yes or no question
-        const confirmed = confirm('This category of personalities requires activating search keyword interception. Are you ok with that?');
-
-        // if the user confirmed, check the checkbox
-        if (confirmed) {
-          checkbox.checked = true;
-          global.intercept_search_keyword=true;
-          chrome.storage.sync.set({ global: global });
-        }
-      }
-    } else if (selectedCategory == 3) {
-      if(global.intercept_search_keyword==false)
-      {
-        // get the checkbox element
-        const checkbox = document.getElementById('intercept_console_checkbox');
-
-        // ask the user a yes or no question
-        const confirmed = confirm('This category of personalities requires activating console keyword interception. Are you ok with that?');
-
-        // if the user confirmed, check the checkbox
-        if (confirmed) {
-          checkbox.checked = true;
-          global.intercept_search_keyword=true;
-          chrome.storage.sync.set({ global: global });
-        }
-      }
-    } 
+    }
     onSubmit();
   } );
 
@@ -816,62 +764,10 @@ function build_ui() {
   show_at_startup_div.appendChild(show_at_startup_label);
   show_at_startup_div.appendChild(show_at_startup);
 
-
-
-
   // ================================settings
   // Create a div to hold the checkboxes
   let checkboxes_div = document.createElement("div");
 
-  // Create checkbox for intercept_search_keyword
-  let intercept_search_checkbox_div = document.createElement("div");
-  intercept_search_checkbox_div.classList.add("input-select-div");
-
-  let intercept_search_checkbox_label = document.createElement("label");
-  intercept_search_checkbox_label.classList.add("input-select-label");
-  intercept_search_checkbox_label.textContent = "Intercept search keyword?";
-
-  let intercept_search_checkbox = document.createElement("input");
-  intercept_search_checkbox.id = "intercept_search_checkbox";
-  intercept_search_checkbox.classList.add("input-checkbox");
-  intercept_search_checkbox.type = "checkbox";
-  intercept_search_checkbox.checked = global.intercept_search_keyword
-
-  intercept_search_checkbox.addEventListener("click", function () {
-    global["intercept_search_keyword"] = this.checked;
-    chrome.storage.sync.set({ global: global });
-  });
-  intercept_search_checkbox.checked = global["intercept_search_keyword"];
-
-  intercept_search_checkbox_div.appendChild(intercept_search_checkbox_label);
-  intercept_search_checkbox_div.appendChild(intercept_search_checkbox);
-
-  checkboxes_div.appendChild(intercept_search_checkbox_div);
-
-  // Create checkbox for intercept_blip_keyword
-  let intercept_blip_checkbox_div = document.createElement("div");
-  intercept_blip_checkbox_div.classList.add("input-select-div");
-
-  let intercept_blip_checkbox_label = document.createElement("label");
-  intercept_blip_checkbox_label.classList.add("input-select-label");
-  intercept_blip_checkbox_label.textContent = "Intercept blip keyword?";
-
-  let intercept_blip_checkbox = document.createElement("input");
-  intercept_blip_checkbox.id = "intercept_blip_checkbox";
-  intercept_blip_checkbox.classList.add("input-checkbox");
-  intercept_blip_checkbox.type = "checkbox";
-  intercept_blip_checkbox.checked = global.intercept_blip_keyword
-
-  intercept_blip_checkbox.addEventListener("click", function () {
-    global["intercept_blip_keyword"] = this.checked;
-    chrome.storage.sync.set({ global: global });
-  });
-  intercept_blip_checkbox.checked = global["intercept_blip_keyword"];
-
-  intercept_blip_checkbox_div.appendChild(intercept_blip_checkbox_label);
-  intercept_blip_checkbox_div.appendChild(intercept_blip_checkbox);
-
-  checkboxes_div.appendChild(intercept_blip_checkbox_div);
 
   // Create checkbox for intercept_console_keyword
   let intercept_console_checkbox_div = document.createElement("div");
@@ -1086,97 +982,85 @@ function callback(mutationsList, observer) {
             console.log(`prompt ${text}`);
 
             // Detect websearch request
-            if(global.intercept_search_keyword)
-            {
-              let searchTerm = `${global.search_trigger_key_word}`;
-              console.log(`searching ${searchTerm} keyword`)
-              let index = text.indexOf(searchTerm);
-              if (index !== -1) {
-                console.log(`Found ${index}`)
-                let substring = text.substring(index + searchTerm.length).replace(/^"|"$/g, '');
-                console.log(substring);
-                try {
-                  let query = substring;
-                  if (!query.includes("&max_results=")) {
-                    // &max_results= not found in query, so add it
-                    query += "&max_results=10";
-                  }
-                  query = query.trim();
-          
-                  if (query === "") {
-                    isProcessing = false;
-                    return;
-                  }
-                  console.log(`Query ${query}`)
-                  api_search(query).then((results) => {
-                    chatGPTResults(results, query, lang_options[global.language].label);
-                    pressEnter();
-                    isProcessing = false;
-                  });
-                } catch (error) {
-                  isProcessing = false;
-                  showErrorMessage(error);
+            let searchTerm = `${global.search_trigger_key_word}`;
+            console.log(`searching ${searchTerm} keyword`)
+            let index = text.indexOf(searchTerm);
+            if (index !== -1) {
+              console.log(`Found ${index}`)
+              let substring = text.substring(index + searchTerm.length).replace(/^"|"$/g, '');
+              console.log(substring);
+              try {
+                let query = substring;
+                if (!query.includes("&max_results=")) {
+                  // &max_results= not found in query, so add it
+                  query += "&max_results=10";
                 }
-                // Do something with the extracted substring
+                query = query.trim();
+        
+                if (query === "") {
+                  isProcessing = false;
+                  return;
+                }
+                console.log(`Query ${query}`)
+                api_search(query).then((results) => {
+                  chatGPTResults(results, query, lang_options[global.language].label);
+                  pressEnter();
+                  isProcessing = false;
+                });
+              } catch (error) {
+                isProcessing = false;
+                showErrorMessage(error);
               }
-            }
-            else{
-              console.log("No search Keyword found")
+              // Do something with the extracted substring
             }
             
-            if(global.intercept_blip_keyword)
-            {
-              // Detect image_questions
-              searchTerm =  `${global.blip_trigger_key_word}`;
-              console.log(`searching ${searchTerm} keyword`)
-              index = text.indexOf(searchTerm);
-              if (index !== -1) {
-                console.log(`Found ${index}`)
-                let substring = text.substring(index + searchTerm.length).replace(/^"|"$/g, '');
-                console.log(substring);
-                substring = substring.replace(/^\n+/, "").split("\n")[0];
-                console.log(substring);
-                try {
-                  const questions = substring.split("|");
+            // Detect image_questions
+            searchTerm =  `${global.blip_trigger_key_word}`;
+            console.log(`searching ${searchTerm} keyword`)
+            index = text.indexOf(searchTerm);
+            if (index !== -1) {
+              console.log(`Found ${index}`)
+              let substring = text.substring(index + searchTerm.length).replace(/^"|"$/g, '');
+              console.log(substring);
+              substring = substring.replace(/^\n+/, "").split("\n")[0];
+              console.log(substring);
+              try {
+                const questions = substring.split("|");
 
-                  const spinner = document.createElement("img");
-                  spinner.src = "https://parisneo.pythonanywhere.com/spinner.gif";
-                  spinner.style.width="10px"
-                  spinner.style.height="10px"
-                  textarea.appendChild(spinner);
-                  fetch("http://localhost:5000/question", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ questions: questions })
-                  })
-                  .then(response => {
-                    if (!response.ok) {
-                      throw new Error("Network response was not ok");
-                    }
-                    return response.json();
-                  })
-                  .then(data => {
-                    console.log(data)
-                    textarea = document.querySelector("textarea");
-                    textarea.value = data.answers.join('|');
-                    pressEnter();
-                    console.log(data);
-                  })
-                  .catch(error => {
-                    console.error("There was a problem with the fetch operation:", error);
-                  });
-                } catch (error) {
-                  isProcessing = false;
-                  showErrorMessage(error);
-                }
-                // Do something with the extracted substring
-              }    
-            }
-            else{
-              console.log("No blip Keyword found")
-            }
+                const spinner = document.createElement("img");
+                spinner.src = "https://parisneo.pythonanywhere.com/spinner.gif";
+                spinner.style.width="10px"
+                spinner.style.height="10px"
+                textarea.appendChild(spinner);
+                fetch("http://localhost:5000/question", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json"
+                  },
+                  body: JSON.stringify({ questions: questions })
+                })
+                .then(response => {
+                  if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                  }
+                  return response.json();
+                })
+                .then(data => {
+                  console.log(data)
+                  textarea = document.querySelector("textarea");
+                  textarea.value = data.answers.join('|');
+                  pressEnter();
+                  console.log(data);
+                })
+                .catch(error => {
+                  console.error("There was a problem with the fetch operation:", error);
+                });
+              } catch (error) {
+                isProcessing = false;
+                showErrorMessage(error);
+              }
+              // Do something with the extracted substring
+            }    
             
             if (global.intercept_console_keyword)
             {
