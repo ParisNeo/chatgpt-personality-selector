@@ -3,7 +3,12 @@
 [![GitHub release](https://badgen.net/github/release/ParisNeo/chatgpt-personality-selector)](https://github.com/ParisNeo/chatgpt-personality-selector/releases)
 [![GitHub license](https://badgen.net/github/license/ParisNeo/chatgpt-personality-selector)](https://github.com/ParisNeo/chatgpt-personality-selector/blob/master/LICENSE)
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/fhbjgbiflinjbdggehcddcbncdddomop.svg)](https://chrome.google.com/webstore/detail/chatgpt-audio-extension/fhbjgbiflinjbdggehcddcbncdddomop)
-[![Translate CSV](https://github.com/ParisNeo/chatgpt-personality-selector/actions/workflows/translate_personalities.yml/badge.svg)](https://github.com/ParisNeo/chatgpt-personality-selector/actions/workflows/translate_personalities.yml)
+![GitHub issues](https://img.shields.io/github/issues/ParisNeo/chatgpt-personality-selector)
+![GitHub stars](https://img.shields.io/github/stars/ParisNeo/chatgpt-personality-selector)
+![GitHub forks](https://img.shields.io/github/forks/ParisNeo/chatgpt-personality-selector)
+[![Discord](https://img.shields.io/discord/1092918764925882418?color=7289da&label=Discord&logo=discord&logoColor=ffffff)](https://discord.gg/4rR282WJb6)
+[![Follow me on Twitter](https://img.shields.io/twitter/follow/SpaceNerduino?style=social)](https://twitter.com/SpaceNerduino)
+[![Follow me on YouTube](https://img.shields.io/badge/Watch%20on-YouTube-red?style=flat&logo=youtube)](https://www.youtube.com/@Parisneo)
 
 ChatGPT Personality Selector is a Google Chrome extension that allows users to customize their chatbot experience. With this extension, users can easily condition their chatbot to become a person or tool specialized in a specific area such as an educator, doctor, translator, password generator, stand-up comedian, psychic, expert in startup creation, developer, prompt generator for art AI, coding helper, Dungeon and Dragons game master, or even a Linux, python or other terminal and many more (more than 176 personalizations in two languages for now).
 
