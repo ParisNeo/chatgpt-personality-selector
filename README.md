@@ -72,3 +72,59 @@ The ChatGPT Personality Selector extension should now be installed and ready to 
 Please be aware that ChatGPT is a sophisticated language model that has been trained on vast amounts of data. However, it is important to note that it is not a human and may provide incorrect or misleading outputs. It should be used with caution and not for making critical decisions such as financial or medical choices, as it may not always be reliable despite its advanced capabilities. The purpose of this tool is to assist and enhance human capabilities, not to replace them. It is highly recommended to always consult with a qualified professional before making any important decisions.
 
 We also want to emphasize that we do not endorse any malicious use of this tool, and we do not take responsibility for any negative outcomes that may occur as a result of using it for bad purposes. This is a tool that is intended to be used for research and development and we do not endorse any misuse of it.
+
+
+# 🧠 ChatGPT Personality Selector v4.0
+
+This extension allows you to condition ChatGPT into specialized personalities and control it via an external local API.
+
+## 🚀 New: Local API Bridge
+You can now send prompts to ChatGPT from outside the browser (e.g., from a Python script or Node.js).
+
+1. Open the **Personality Selector** menu in ChatGPT.
+2. Toggle **External API Bridge** to ON.
+3. Run a local server on port `4242` with a `/next_prompt` endpoint.
+
+### Python Example (Flask)
+```python
+from flask import Flask, jsonify
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app) # Vital for browser access
+
+# Set this value whenever you want to trigger ChatGPT
+next_payload = {"prompt": "Write a poem about robots.", "execute": True}
+
+@app.route('/next_prompt')
+def get_prompt():
+    global next_payload
+    if next_payload:
+        data = jsonify(next_payload)
+        next_payload = None # Clear it so it only runs once
+        return data, 200
+    return "", 204 # No content
+
+app.run(port=4242)
+```
+
+## 🛠 Features
+- **170+ Personalities**: Instantly switch between expert personas.
+- **Deep Injection**: Works with ChatGPT's newest `contenteditable` UI.
+- **Auto-Execute**: Extension automatically clicks "Send" after injection.
+
+### How to use the new UI:
+1. Reload the extension in `chrome://extensions`.
+2. Refresh ChatGPT.
+3. Click the **🪛 Personality Selector** button in the sidebar.
+4. You will see a clean menu. Check the **External API Bridge** box.
+5. As soon as your local Python/Node server returns a JSON object at `localhost:4242/next_prompt`, ChatGPT will automatically fill and send the prompt.
+
+**Payload Format:**
+```json
+{
+  "prompt": "Your text here",
+  "execute": true 
+}
+```
+*(If `execute` is true, it clicks the send button automatically. If false, it just fills the text box.)*
